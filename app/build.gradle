@@ -1,0 +1,95 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'com.didi.dokit'
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.zph.media"
+        minSdkVersion 27
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    //kotlin
+    implementation 'androidx.core:core-ktx:1.0.0'
+    implementation 'org.jetbrains.anko:anko:0.10.8'
+    implementation 'org.jetbrains.anko:anko-commons:0.10.8'
+    //腾讯QMUI-框架
+    implementation 'com.qmuiteam:qmui:2.0.0-alpha08'
+    //腾讯QMUI配置arch
+    implementation 'com.qmuiteam:arch:0.3.1'
+    //butterknife
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    implementation 'com.jakewharton:butterknife:8.4.0'
+    //dokit
+//    debugImplementation 'com.didichuxing.doraemonkit:doraemonkit:3.1.5'
+//    releaseImplementation 'com.didichuxing.doraemonkit:doraemonkit-no-op:3.1.5'
+    //MultiDex
+    implementation 'com.android.support:multidex:1.0.1'
+}
+//dokitExt {
+//    //dokit 插件开关
+//    dokitPluginSwitch true
+//    //通用设置
+//    comm {
+//        //地图经纬度开关
+//        gpsSwitch true
+//        //网络开关
+//        networkSwitch true
+//        //大图开关
+//        bigImgSwitch true
+//    }
+//
+//    slowMethod {
+//        //0:默认模式 打印函数调用栈 需添加指定入口  默认为application onCreate 和attachBaseContext
+//        //1:普通模式 运行时打印某个函数的耗时 全局业务代码函数插入
+//        strategy 0
+//        //函数功能开关
+//        methodSwitch true
+//
+//        //调用栈模式配置
+//        stackMethod {
+//            //默认值为 5ms 小于该值的函数在调用栈中不显示
+//            thresholdTime 10
+//            //调用栈函数入口
+//            enterMethods = ["com.didichuxing.doraemondemo.MainDebugActivity.test1"]
+//        }
+//        //普通模式配置
+//        normalMethod {
+//            //默认值为 500ms 小于该值的函数在运行时不会在控制台中被打印
+//            thresholdTime 500
+//            //需要针对函数插装的包名
+//            packageNames = ["com.didichuxing.doraemondemo"]
+//            //不需要针对函数插装的包名&类名
+//            methodBlacklist = ["com.didichuxing.doraemondemo.dokit"]
+//        }
+//    }
+//}
+

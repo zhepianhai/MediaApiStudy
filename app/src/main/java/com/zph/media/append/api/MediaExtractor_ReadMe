@@ -1,0 +1,88 @@
+MediaExtractor构造函数：
+MediaExtractor()
+
+MediaExtractor 主要方法说明：
+设置数据源：
+setDataSource(AssetFileDescriptor afd)
+setDataSource(Context context, Uri uri, Map<String, String> headers)
+setDataSource(FileDescriptor fd)
+setDataSource(MediaDataSource dataSource)
+setDataSource(FileDescriptor fd, long offset, long length)
+void setDataSource(String path)//既可以是文件路径，也可以是文件url网址。
+void setDataSource(String path, Map<String, String> headers)//既可以是文件路径，也可以是文件url网址。
+
+获取源文件轨道数（包括视频和音频）
+getTrackCount()
+
+获取某个轨道的MediaFormat：
+MediaFormat getTrackFormat(int index)，MediaFormat包含该轨道的很多配置信息。
+
+选定轨道：
+selectTrack(int index):选定特定的轨道，会影响 readSampleData(ByteBuffer, int), getSampleTrackIndex() and getSampleTime()的输出，这三个函数输出的是选定轨道的信息。
+
+读取信息：
+readSampleData(ByteBuffer byteBuf, int offset)：读取数据到bytebuffer中，从offset偏移开始。选定轨道之后可以读取该轨道的数据。
+
+获取下一帧数据：
+advance()获取下一帧数据
+
+释放资源：
+release()释放资源。
+
+
+--=====================================================================
+
+2 MediaFormat
+MediaFormat封装了Media data的描述信息，通过描述信息可以分辨Meida data 是一个音频还是视频。描述信息是一个键值对，可以通过MediaFormat的getXX函数获取。
+
+MediaFormat 可以通过MediaExtractor 的getTrackFormat（Index） 获取，也可以通过构造函数自己构造。
+
+MediaFormat构造函数：
+MediaFormat()
+
+createAudioFormat(String mime, int sampleRate, int channelCount)
+创建一个音频的MediaFormat
+参数说明：
+
+mime:文件类型
+sampleRate：采样率
+channelCount：声音轨道数
+Mime文件类型：
+常见的MIME类型多媒体格式如下（以audio开头的是音频，以video开头的是视频）：
+
+“video/x-vnd.on2.vp8” - VP8 video (i.e. video in .webm)
+“video/x-vnd.on2.vp9” - VP9 video (i.e. video in .webm)
+“video/avc” - H.264/AVC video
+“video/mp4v-es” - MPEG4 video
+“video/3gpp” - H.263 video
+“audio/3gpp” - AMR narrowband audio
+“audio/amr-wb” - AMR wideband audio
+“audio/mpeg” - MPEG1/2 audio layer III
+“audio/mp4a-latm” - AAC audio (note, this is raw AAC packets, not packaged in LATM!)
+“audio/vorbis” - vorbis audio
+“audio/g711-alaw” - G.711 alaw audio
+“audio/g711-mlaw” - G.711 ulaw audio
+。。。还有很多格式请参考MediaFormat中的格式常量
+字幕Track格式：
+MIMETYPE_TEXT_VTT = “text/vtt”;
+MIMETYPE_TEXT_CEA_608 = “text/cea-608”;
+MIMETYPE_TEXT_CEA_708 = “text/cea-708”;
+MediaFormat中mime有对应的常量，MIMETYPE_AUDIO_AAC对应audio/mp4a-latm，MIMETYPE_VIDEO_AVC对应 "video/avc"等等，其他对应参考MediaFormat内常量。
+
+至于这些类型对应什么类型的文件这里举几个例子：mp3为audio/mpeg；aac为audio/mp4a-latm；mp4为video/mp4v-es 。
+
+createVideoFormat(String mime, int width, int height)
+创建一个视频的MediaFormat，mime含义和上面相同，width,height含义为视频宽高。
+
+MediaExtractor的getTrackFormat也可以获取MediaFormat。
+
+通过key值获取信息的getXXX函数：
+getFloat(String name)
+getInteger(String name)
+getLong(String name)
+getString(String name)
+利用MediaFormat的key常量获取值。
+
+常见的key值包括：
+KEY_MIME,KEY_CHANNEL_COUNT,KEY_SAMPLE_RATE,KEY_DURATION,KEY_WIDTH,KEY_HEIGHT等。
+

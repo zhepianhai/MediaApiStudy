@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/qmui_topbar_height"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textSize="16sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/line_color"
+             />
+
+        <GridView
+            android:id="@+id/gridview_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:numColumns="3"
+            android:background="@color/line_color2"
+            android:listSelector="@null"
+            android:verticalSpacing="0.5dp"
+            android:horizontalSpacing="0.5dp"
+            android:soundEffectsEnabled="true"
+            android:smoothScrollbar="true"
+            android:stretchMode="columnWidth"
+            />
+    </LinearLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

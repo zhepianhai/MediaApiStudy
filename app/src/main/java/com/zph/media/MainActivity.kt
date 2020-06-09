@@ -1,0 +1,102 @@
+package com.zph.media
+
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.os.Environment
+import android.os.Environment.getExternalStorageDirectory
+import com.zph.media.append.api.AndroidAudioApiActivity
+import com.zph.media.append.api.AndroidMediaApiActivity
+import com.zph.media.append.api.MediaExtractorActivity
+import com.zph.media.append.api.MediaMuxerActivity
+import com.zph.media.base.BaseActivity
+import com.zph.media.config.Constants
+import com.zph.media.home.adapter.AdapterGridHome
+import com.zph.media.util.FileUtil
+import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+
+
+class MainActivity : BaseActivity() {
+
+    private var adapter: AdapterGridHome?=null
+    private val mData : MutableList<String> = arrayListOf()
+
+    companion object {
+
+        open fun openActivity(activity: Activity) {
+            val intent = Intent(activity, MainActivity::class.java)
+            activity.startActivity(intent)
+        }
+    }
+
+    override fun getLayoutId(): Int {
+       return R.layout.activity_main
+    }
+
+    override fun initTopBar() {
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initFile()
+        initGridView()
+    }
+    private fun initFile() {
+        if(Environment.getExternalStorageState()==Environment.MEDIA_MOUNTED){
+            //文件创建
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_IMAGE_FILE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_AUDIO_FILE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_ACC_FILE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_H246_FILE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_MP4_FILE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_PCM_FILE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_TEMP_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_OTHER_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_CACHE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH)
+            var fileTest=File(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH+"/test.mp4")
+            if(!fileTest.exists()){
+                FileUtil.copyFilesFromRaw(this,R.raw.test,"test.mp4",getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH)
+            }
+        }
+
+    }
+
+    private fun initGridView() {
+        mData.add(0,"Media")
+        mData.add(1,"PCM")
+        mData.add(2,"MediaExtractor")
+        mData.add(3,"MediaMuxer")
+        mData.add(4,"H.264")
+        mData.add(5,"YUV")
+        mData.add(6,"IPB帧")
+        adapter=AdapterGridHome(this,mData)
+        gridview_home.adapter=adapter
+        gridview_home.setOnItemClickListener { parent, view, position, id ->
+            run {
+                when (position) {
+                    0 -> {
+                        AndroidMediaApiActivity.openActivity(this)
+                    }
+                    1->{
+                        AndroidAudioApiActivity.openActivity(this)
+                    }
+                    2->{
+                        MediaExtractorActivity.openActivity(this)
+                    }
+                    3->{
+                        MediaMuxerActivity.openActivity(this)
+                    }
+                    else -> {
+
+                    }
+                }
+            }
+        }
+    }
+
+
+}
