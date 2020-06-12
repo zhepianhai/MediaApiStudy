@@ -1,0 +1,41 @@
+1 MediaMuxer 说明
+前面利用MediaExtractor提取的aac和.h264文件不经过处理没办法播放，这次利用MediaExtractor和MediaMuxer配合提取合并生成可以播放的文件，ps：aac文件和.h264需要首先利用MediaMuxer生成MP4文件，才能进行合并。
+
+MediaMuxer从api18开始提供，可以封装编码后的视频流和音频流到视频文件中。目前MediaMuxer支持的文件输出格式包括MP4，webm和3gp.
+构造函数：
+MediaMuxer(String path, int format)
+MediaMuxer(FileDescriptor fd, int format)
+参数说明：
+两个构造函数都需要一个文件路径，和一个format。
+**path，fd:**用于存放合成的文件的路径，不能为null。
+**format：**输出的文件的格式，OutputFormat中的常量标识。
+输出格式：
+OutputFormat中包含四种：
+MUXER_OUTPUT_3GPP：对应3gp文件，
+MUXER_OUTPUT_HEIF：定影HEIF文件，
+MUXER_OUTPUT_MPEG_4：对应mp4文件，
+MUXER_OUTPUT_WEBM：对应webm文件。
+————————————————
+
+
+主要函数说明：
+addTrack(MediaFormat format)：利用MediaFormat添加音频或视频轨道。
+release（）：释放MediaMuxer的资源。
+setLocation（float latitude,float longitude）:设置并存储地理位置信息到生成文件中。
+setOrientationHint（int degrees）:设置输出视频回放的方向提示。
+start() :开始muxer，等待数据的输入。
+Stop():停止muxer，调用这个函数后将生成合成的文件。
+writeSampleData(int trackIndex, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo)：
+往muxer中写入编码的数据。
+参数说明：
+trackIndex：sample（样本）的track index，可以利用MediaExtractor获取。
+byteBuf：写入的数据，不可为null；
+bufferInfo：当前sample（样本）相关的buffer的信息，不可为null。
+
+MediaCodec.BufferInfo:
+主要包括四个数据：
+flags:输入buffer相关的buffer flags。
+offset：buffer开始的偏移量，通常设为0。
+presentationTimeUs:buffer的时间戳。
+size：buffer的数据大小。
+————————————————

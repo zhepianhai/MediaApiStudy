@@ -27,7 +27,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".append.api.MediaMuxerActivity"></activity>
+        <activity android:name=".append.api.MediaCodecActivity"></activity>
+        <activity android:name=".append.api.MediaMuxerActivity" />
 
         <meta-data
             android:name="android.notch_support"
