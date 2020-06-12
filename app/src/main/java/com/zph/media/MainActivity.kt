@@ -9,6 +9,7 @@ import com.zph.media.append.api.AndroidAudioApiActivity
 import com.zph.media.append.api.AndroidMediaApiActivity
 import com.zph.media.append.api.MediaExtractorActivity
 import com.zph.media.append.api.MediaMuxerActivity
+import com.zph.media.append.api.codec.MediaCodecActivity
 import com.zph.media.base.BaseActivity
 import com.zph.media.config.Constants
 import com.zph.media.home.adapter.AdapterGridHome
@@ -70,9 +71,10 @@ class MainActivity : BaseActivity() {
         mData.add(1,"PCM")
         mData.add(2,"MediaExtractor")
         mData.add(3,"MediaMuxer")
-        mData.add(4,"H.264")
-        mData.add(5,"YUV")
-        mData.add(6,"IPB帧")
+        mData.add(4,"MediaCodec")
+        mData.add(5,"H.264")
+        mData.add(6,"YUV")
+        mData.add(7,"IPB帧")
         adapter=AdapterGridHome(this,mData)
         gridview_home.adapter=adapter
         gridview_home.setOnItemClickListener { parent, view, position, id ->
@@ -89,6 +91,9 @@ class MainActivity : BaseActivity() {
                     }
                     3->{
                         MediaMuxerActivity.openActivity(this)
+                    }
+                    4->{
+                        MediaCodecActivity.openActivity(this)
                     }
                     else -> {
 
