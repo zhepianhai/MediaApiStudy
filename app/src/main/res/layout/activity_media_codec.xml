@@ -50,12 +50,33 @@
                 android:id="@+id/ll_audio_codec"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/btn_getpcm"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="wrap_content"
+                        android:text="mp3解码成原始的PCM"/>
+
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_codec_aduio_hind"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/ll_video_codec"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
+
+
         </FrameLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

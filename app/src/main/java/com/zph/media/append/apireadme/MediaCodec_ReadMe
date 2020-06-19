@@ -1,0 +1,18 @@
+ Android 硬编码流控
+   配置时指定目标码率和码率控制模式：
+   mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+   mediaFormat.setInteger(MediaFormat.KEY_BITRATE_MODE,
+   MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR);
+   mVideoCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+
+    码率控制模式有三种：
+
+    CQ 表示完全不控制码率，尽最大可能保证图像质量；
+    CBR 表示编码器会尽量把输出码率控制为设定值，即我们前面提到的“不为所动”；
+    VBR 表示编码器会根据图像内容的复杂度（实际上是帧间变化量的大小）来动态调整输出码率，图像复杂则码率高，图像简单则码率低；
+
+
+   Android 流控策略选择
+   质量要求高、不在乎带宽、解码器支持码率剧烈波动的情况下，可以选择 CQ 码率控制策略。
+   VBR 输出码率会在一定范围内波动，对于小幅晃动，方块效应会有所改善，但对剧烈晃动仍无能为力；连续调低码率则会导致码率急剧下降，如果无法接受这个问题，那 VBR 就不是好的选择。
+   CBR 的优点是稳定可控，这样对实时性的保证有帮助。所以 WebRTC 开发中一般使用的是CBR。

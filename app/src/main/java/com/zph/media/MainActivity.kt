@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.getExternalStorageDirectory
+import android.util.Log
 import com.zph.media.append.api.AndroidAudioApiActivity
 import com.zph.media.append.api.AndroidMediaApiActivity
 import com.zph.media.append.api.MediaExtractorActivity
@@ -58,10 +59,18 @@ class MainActivity : BaseActivity() {
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_OTHER_PATH)
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_CACHE_PATH)
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH)
-            var fileTest=File(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH+"/test.mp4")
-            if(!fileTest.exists()){
+            //测试数据的视频源文件
+            var fileTestMp4=File(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH+"/test.mp4")
+            if(!fileTestMp4.exists()){
                 FileUtil.copyFilesFromRaw(this,R.raw.test,"test.mp4",getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH)
             }
+            //测试数据的音频源文件
+            var fileTestMp3=File(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH+"/music.mp3")
+            if(!fileTestMp3.exists()){
+                FileUtil.copyFilesFromRaw(this,R.raw.music,"music.mp3",getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_+Constants.ZPH_SOURCE_PATH)
+            }
+        }else{
+            Log.i("TAGG","文件创建失败")
         }
 
     }
