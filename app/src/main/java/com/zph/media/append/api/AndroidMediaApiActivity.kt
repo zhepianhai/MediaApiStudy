@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
@@ -21,14 +20,14 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.TextureView.SurfaceTextureListener
 import android.view.View
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.zph.media.R
 import com.zph.media.base.BaseActivity
+import com.zph.media.util.BitmapUtils
 import com.zph.media.util.CameraUtil
+import com.zph.media.util.ToastUtil
 import kotlinx.android.synthetic.main.activity_android_media_api.*
-import kotlinx.android.synthetic.main.layout_navi.*
 
 
 /**
@@ -47,10 +46,10 @@ open class AndroidMediaApiActivity : BaseActivity() {
     private lateinit var mCameraCaptureSession: CameraCaptureSession
     private lateinit var mCameraDevice: CameraDevice
     private lateinit var previewRequestBuilder: CaptureRequest.Builder
-
+    private var mCameraSensorOrientation = 0        //摄像头方向
     private val REQUEST_CAMERA_CODE = 100
     private val ORIENTATIONS = SparseIntArray()
-
+    private var handlerThread = HandlerThread("Camera2")
     init {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -77,10 +76,10 @@ open class AndroidMediaApiActivity : BaseActivity() {
     }
 
     override fun initTopBar() {
-        tv_title.text = "MediaPlay"
-        lay_back.setOnClickListener {
-            finish()
-        }
+//        tv_title.text = "MediaPlay"
+//        lay_back.setOnClickListener {
+//            finish()
+//        }
     }
 
     private fun initVideoView() {
@@ -97,7 +96,22 @@ open class AndroidMediaApiActivity : BaseActivity() {
 //            WindowManager.LayoutParams.FLAG_FULLSCREEN
 //        )
 //        path="android.resource://"+ packageName +"/"+R.raw.test
+        btn_take_pic.setOnClickListener {
+            if (mCameraDevice != null &&mSufaceView.isAvailable ) {
+                mCameraDevice?.apply {
+                    val captureRequestBuilder = createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+                    captureRequestBuilder.addTarget(mImageReader?.surface)
 
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE) // 自动对焦
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)     // 闪光灯
+                    captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, mCameraSensorOrientation)      //根据摄像头方向对保存的照片进行旋转，使其为"自然方向"
+                    mCameraCaptureSession?.capture(captureRequestBuilder.build(), null, childHandler)
+                        ?: ToastUtil.showToast(this@AndroidMediaApiActivity,"拍照异常")
+                }
+
+            }
+
+        }
     }
     private inner class texturListener : SurfaceTextureListener {
         override fun onSurfaceTextureSizeChanged(
@@ -144,24 +158,28 @@ open class AndroidMediaApiActivity : BaseActivity() {
     }
 
     private fun initCamera2(width: Int,height: Int) {
-        var handlerThread = HandlerThread("Camera2")
+
         handlerThread.start()
         childHandler = Handler(handlerThread.looper)
         mainHandler = Handler(mainLooper)
         mCameraID = "" + CameraCharacteristics.LENS_FACING_FRONT
-        mImageReader = ImageReader.newInstance(1080, 1920, ImageFormat.YUV_420_888, 1)
+        mImageReader = ImageReader.newInstance(1080, 1920, ImageFormat.JPEG, 1)
         mImageReader.setOnImageAvailableListener(ImageReader.OnImageAvailableListener {
             var image = it.acquireLatestImage()
             var buffer = image.planes[0].buffer
             val bytes = ByteArray(buffer.remaining())
             buffer.get(bytes)
-            var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            if (null != bitmap) {
-                img_picpreview.visibility = View.VISIBLE
-                img_picpreview.setImageBitmap(bitmap)
-            }
-
-        }, mainHandler)
+            it.close()
+            BitmapUtils.savePic(bytes, mCameraSensorOrientation == 270, { savedPath, time ->
+                this.runOnUiThread {
+                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存成功！ 保存路径：$savedPath 耗时：$time")
+                }
+            }, { msg ->
+                this.runOnUiThread {
+                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存失败：$msg")
+                }
+            })
+        }, childHandler)
 
         //获取摄像头管理
 
@@ -184,6 +202,9 @@ open class AndroidMediaApiActivity : BaseActivity() {
                     cameraManager.getCameraCharacteristics(cameraId)
                 //获取是前置还是后置摄像头
                 val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
+                //获取摄像头方向
+                mCameraSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
+
                 //使用后置摄像头
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     val map =
@@ -272,7 +293,8 @@ open class AndroidMediaApiActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-
+        releaseCamera()
+        releaseThread()
         super.onDestroy()
     }
 
@@ -288,6 +310,22 @@ open class AndroidMediaApiActivity : BaseActivity() {
                 cameraManager.openCamera(mCameraID, stateCallback(), childHandler)
             }
         }
+    }
+
+
+    /**
+     * 释放资源
+     * */
+    fun releaseCamera() {
+        mCameraCaptureSession?.close()
+
+        mCameraDevice?.close()
+
+        mImageReader?.close()
+    }
+
+    fun releaseThread() {
+        handlerThread.quitSafely()
     }
 }
 

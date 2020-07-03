@@ -53,6 +53,9 @@ dependencies {
 //    releaseImplementation 'com.didichuxing.doraemonkit:doraemonkit-no-op:3.1.5'
     //MultiDex
     implementation 'com.android.support:multidex:1.0.1'
+    //Read and write
+    implementation "com.squareup.okio:okio:2.4.0"
+
 }
 //dokitExt {
 //    //dokit 插件开关
