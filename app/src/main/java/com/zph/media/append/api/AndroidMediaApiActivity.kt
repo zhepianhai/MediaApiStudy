@@ -163,23 +163,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
         childHandler = Handler(handlerThread.looper)
         mainHandler = Handler(mainLooper)
         mCameraID = "" + CameraCharacteristics.LENS_FACING_FRONT
-        mImageReader = ImageReader.newInstance(1080, 1920, ImageFormat.JPEG, 1)
-        mImageReader.setOnImageAvailableListener(ImageReader.OnImageAvailableListener {
-            var image = it.acquireLatestImage()
-            var buffer = image.planes[0].buffer
-            val bytes = ByteArray(buffer.remaining())
-            buffer.get(bytes)
-            it.close()
-            BitmapUtils.savePic(bytes, mCameraSensorOrientation == 270, { savedPath, time ->
-                this.runOnUiThread {
-                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存成功！ 保存路径：$savedPath 耗时：$time")
-                }
-            }, { msg ->
-                this.runOnUiThread {
-                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存失败：$msg")
-                }
-            })
-        }, childHandler)
+
 
         //获取摄像头管理
 
@@ -202,8 +186,6 @@ open class AndroidMediaApiActivity : BaseActivity() {
                     cameraManager.getCameraCharacteristics(cameraId)
                 //获取是前置还是后置摄像头
                 val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
-                //获取摄像头方向
-                mCameraSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
 
                 //使用后置摄像头
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
@@ -216,9 +198,14 @@ open class AndroidMediaApiActivity : BaseActivity() {
                             ), width, height
                         )!!
                         mCameraID = cameraId
+                        initImageReader()
                     }
                 }
+                //获取摄像头方向
+                mCameraSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
+
             }
+
             Log.i("TAGG", "mCameraID:$mCameraID")
             Log.i("TAGG", "previewSize:"+previewSize.height)
             Log.i("TAGG", "previewSize:"+previewSize.width)
@@ -229,6 +216,28 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
 
 
+    }
+
+    private fun initImageReader() {
+        mImageReader = ImageReader.newInstance(previewSize.width, previewSize.height, ImageFormat.JPEG, 1)
+        mImageReader.setOnImageAvailableListener(ImageReader.OnImageAvailableListener {
+            val image = it.acquireNextImage()
+            val byteBuffer = image.planes[0].buffer
+            val byteArray = ByteArray(byteBuffer.remaining())
+            byteBuffer.get(byteArray)
+            it.close()
+            Log.i("TAGG","mCameraSensorOrientation: $mCameraSensorOrientation")
+            BitmapUtils.savePic(byteArray, mCameraSensorOrientation == 270, { savedPath, time ->
+                this.runOnUiThread {
+                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存成功！ 保存路径：$savedPath 耗时：$time")
+                }
+            }, { msg ->
+                this.runOnUiThread {
+                    Log.i("TAGG","错误: $msg")
+                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存失败：$msg")
+                }
+            })
+        }, childHandler)
     }
 
     private inner class stateCallback : CameraDevice.StateCallback() {
