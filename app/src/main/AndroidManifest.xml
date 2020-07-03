@@ -27,7 +27,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".append.api.codec.MediaCodecActivity"></activity>
+        <activity android:name=".append.api.camera2.Camera2Test1Activity"></activity>
+        <activity android:name=".append.api.codec.MediaCodecActivity" />
         <activity android:name=".append.api.MediaMuxerActivity" />
 
         <meta-data

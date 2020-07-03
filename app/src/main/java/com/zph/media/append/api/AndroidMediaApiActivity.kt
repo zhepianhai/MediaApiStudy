@@ -8,22 +8,29 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
+import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.media.ImageReader
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
+import android.util.Log
+import android.util.Size
 import android.util.SparseIntArray
 import android.view.Surface
 import android.view.SurfaceHolder
+import android.view.TextureView.SurfaceTextureListener
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.zph.media.R
 import com.zph.media.base.BaseActivity
+import com.zph.media.util.CameraUtil
 import kotlinx.android.synthetic.main.activity_android_media_api.*
 import kotlinx.android.synthetic.main.layout_navi.*
+
+
 /**
  * 视频，camera2 预览
  *
@@ -33,7 +40,6 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
     private lateinit var camera: CameraDevice
     private lateinit var cameraManager: CameraManager
-    private lateinit var mSurfaceHolder: SurfaceHolder
     private lateinit var childHandler: Handler
     private lateinit var mainHandler: Handler
     private var mCameraID = "0" //摄像头Id 0 为后  1 为前
@@ -53,7 +59,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
     }
 
     companion object {
-
+        var previewSize= Size(408, 640)
         open fun openActivity(activity: Activity) {
             val intent = Intent(activity, AndroidMediaApiActivity::class.java)
             activity.startActivity(intent)
@@ -78,19 +84,43 @@ open class AndroidMediaApiActivity : BaseActivity() {
     }
 
     private fun initVideoView() {
-        mSurfaceHolder = mSufaceView.holder
-        mSurfaceHolder.setKeepScreenOn(true)
-        mSurfaceHolder.addCallback(SurfaceCallback())
+//        mSurfaceHolder = mSufaceView.surfaceTexture
+//        mSurfaceHolder.set(true)
+//        mSurfaceHolder.addCallback(SurfaceCallback())
+//        mSurfaceHolder.setOnFrameAvailableListener {
+//            initCamera2();
+//        }
+        mSufaceView.surfaceTextureListener = texturListener()
 
-
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
+//        window.setFlags(
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN
+//        )
 //        path="android.resource://"+ packageName +"/"+R.raw.test
 
     }
+    private inner class texturListener : SurfaceTextureListener {
+        override fun onSurfaceTextureSizeChanged(
+            surface: SurfaceTexture?,
+            width: Int,
+            height: Int
+        ) {
 
+        }
+
+        override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+        }
+
+        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+            return false
+        }
+
+        override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+            Log.i("TAGG", "onSurfaceTextureAvailable")
+            initCamera2(width,height)
+        }
+
+    }
     private inner class SurfaceCallback : SurfaceHolder.Callback {
         override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
         }
@@ -105,7 +135,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
         override fun surfaceCreated(holder: SurfaceHolder?) {
             try {
-                initCamera2();
+//                initCamera2();
 
             } catch (e: Exception) {
             }
@@ -113,7 +143,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
     }
 
-    private fun initCamera2() {
+    private fun initCamera2(width: Int,height: Int) {
         var handlerThread = HandlerThread("Camera2")
         handlerThread.start()
         childHandler = Handler(handlerThread.looper)
@@ -147,13 +177,44 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
             return
         }
-        cameraManager.openCamera(mCameraID, stateCallback(), mainHandler)
+        try {
+            for (cameraId in cameraManager.cameraIdList) {
+                //描述相机设备的属性类
+                val characteristics =
+                    cameraManager.getCameraCharacteristics(cameraId)
+                //获取是前置还是后置摄像头
+                val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
+                //使用后置摄像头
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+                    val map =
+                        characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                    if (map != null) {
+                        previewSize = CameraUtil.getOptimalSize(
+                            map.getOutputSizes(
+                                SurfaceTexture::class.java
+                            ), width, height
+                        )!!
+                        mCameraID = cameraId
+                    }
+                }
+            }
+            Log.i("TAGG", "mCameraID:$mCameraID")
+            Log.i("TAGG", "previewSize:"+previewSize.height)
+            Log.i("TAGG", "previewSize:"+previewSize.width)
+            cameraManager.openCamera(mCameraID, stateCallback(), mainHandler)
+        } catch (r: CameraAccessException) {
+            Log.i("TAGG","CameraAccessException:"+r.message)
+        }
+
+
+
     }
 
     private inner class stateCallback : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
             mCameraDevice = camera
             //开启预览
+            Log.i("TAGG","StateCallback:")
             takePreview();
         }
 
@@ -175,8 +236,12 @@ open class AndroidMediaApiActivity : BaseActivity() {
             previewRequestBuilder =
                 mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             // 将SurfaceView的surface作为CaptureRequest.Builder的目标
-            previewRequestBuilder.addTarget(mSurfaceHolder.surface);
-            var strings = listOf<Surface>(mSurfaceHolder.surface, mImageReader.surface)
+            val surfaceTexture: SurfaceTexture = mSufaceView.surfaceTexture
+            surfaceTexture.setDefaultBufferSize(previewSize.width, previewSize.height)
+            val previewSurface = Surface(surfaceTexture)
+            mSufaceView.setAspectRation(previewSize.width, previewSize.height);
+            previewRequestBuilder.addTarget(previewSurface);
+            var strings = listOf<Surface>(previewSurface, mImageReader.surface)
             mCameraDevice.createCaptureSession(strings, stateCallback1111(), childHandler)
 
 
@@ -186,7 +251,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
     private inner class stateCallback1111 : CameraCaptureSession.StateCallback() {
         override fun onConfigureFailed(session: CameraCaptureSession) {
-
+            Log.i("TAGG","stateCallback1111:")
         }
 
         override fun onConfigured(session: CameraCaptureSession) {
@@ -220,7 +285,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CAMERA_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                cameraManager.openCamera(mCameraID, stateCallback(), mainHandler)
+                cameraManager.openCamera(mCameraID, stateCallback(), childHandler)
             }
         }
     }

@@ -20,9 +20,9 @@ class AudioEncodeRunnable( pcmPath:String,  audioPath:String,   listener:AudioCo
     private var mListener: AudioCodec.AudioDecodeListener
 
     init {
-        this.pcmPath = pcmPath;
-        this.audioPath = audioPath;
-        this.mListener = listener;
+        this.pcmPath = pcmPath
+        this.audioPath = audioPath
+        this.mListener = listener
     }
     override fun run() {
        try {

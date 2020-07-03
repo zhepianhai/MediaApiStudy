@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.getExternalStorageDirectory
 import android.util.Log
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog
 import com.zph.media.append.api.AndroidAudioApiActivity
 import com.zph.media.append.api.AndroidMediaApiActivity
 import com.zph.media.append.api.MediaExtractorActivity
@@ -39,11 +40,11 @@ class MainActivity : BaseActivity() {
     override fun initTopBar() {
 
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initFile()
         initGridView()
+
     }
     private fun initFile() {
         if(Environment.getExternalStorageState()==Environment.MEDIA_MOUNTED){
