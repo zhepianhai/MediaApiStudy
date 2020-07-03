@@ -19,7 +19,6 @@ import android.util.SparseIntArray
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.TextureView.SurfaceTextureListener
-import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.zph.media.R
@@ -101,10 +100,11 @@ open class AndroidMediaApiActivity : BaseActivity() {
                 mCameraDevice?.apply {
                     val captureRequestBuilder = createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
                     captureRequestBuilder.addTarget(mImageReader?.surface)
+                    val rotation = windowManager.defaultDisplay.rotation
 
                     captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE) // 自动对焦
                     captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)     // 闪光灯
-                    captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, mCameraSensorOrientation)      //根据摄像头方向对保存的照片进行旋转，使其为"自然方向"
+                    captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotation)      //根据摄像头方向对保存的照片进行旋转，使其为"自然方向"
                     mCameraCaptureSession?.capture(captureRequestBuilder.build(), null, childHandler)
                         ?: ToastUtil.showToast(this@AndroidMediaApiActivity,"拍照异常")
                 }
@@ -227,7 +227,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
             byteBuffer.get(byteArray)
             it.close()
             Log.i("TAGG","mCameraSensorOrientation: $mCameraSensorOrientation")
-            BitmapUtils.savePic(byteArray, mCameraSensorOrientation == 270, { savedPath, time ->
+            BitmapUtils.savePic(byteArray, true, { savedPath, time ->
                 this.runOnUiThread {
                     ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存成功！ 保存路径：$savedPath 耗时：$time")
                 }
