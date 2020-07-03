@@ -207,7 +207,6 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
                 //获取是前置还是后置摄像头
                 val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
-                Log.i("TAGG", "facing:$facing");
                 //使用后置摄像头
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     val map =
@@ -215,10 +214,15 @@ open class AndroidMediaApiActivity : BaseActivity() {
                     if (map != null) {
                         var sizeMap = map.getOutputSizes(SurfaceTexture::class.java)
                         if (null != sizeMap) {
-                            previewSize = CameraUtil.getOptimalSize(
-                                sizeMap, width, height
-                            )!!
+                            //这个参数表明，获取的是对应surfaceTexture的输出分辨率，也就是对应textureView的分辨率
+                            //找到不为空的，才能设置对应显示实时的大小
+                            //从底层拿camera支持的previewsize，完了和屏幕分辨率做差，diff最小的就是最佳预览分辨率
 
+
+//                            previewSize = CameraUtil.getOptimalSize(
+//                                sizeMap, width, height
+//                            )!!
+                            previewSize=CameraUtil.setPreviewSize(mSufaceView,characteristics)
                             mCameraID = cameraId
                             initImageReader()
                         }
