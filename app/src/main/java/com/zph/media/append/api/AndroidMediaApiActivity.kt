@@ -49,6 +49,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
     private val REQUEST_CAMERA_CODE = 100
     private val ORIENTATIONS = SparseIntArray()
     private var handlerThread = HandlerThread("Camera2")
+
     init {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -57,7 +58,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
     }
 
     companion object {
-        var previewSize= Size(408, 640)
+        var previewSize = Size(408, 640)
         open fun openActivity(activity: Activity) {
             val intent = Intent(activity, AndroidMediaApiActivity::class.java)
             activity.startActivity(intent)
@@ -96,23 +97,38 @@ open class AndroidMediaApiActivity : BaseActivity() {
 //        )
 //        path="android.resource://"+ packageName +"/"+R.raw.test
         btn_take_pic.setOnClickListener {
-            if (mCameraDevice != null &&mSufaceView.isAvailable ) {
+            if (mCameraDevice != null && mSufaceView.isAvailable) {
                 mCameraDevice?.apply {
-                    val captureRequestBuilder = createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+                    val captureRequestBuilder =
+                        createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
                     captureRequestBuilder.addTarget(mImageReader?.surface)
                     val rotation = windowManager.defaultDisplay.rotation
 
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE) // 自动对焦
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)     // 闪光灯
-                    captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, rotation)      //根据摄像头方向对保存的照片进行旋转，使其为"自然方向"
-                    mCameraCaptureSession?.capture(captureRequestBuilder.build(), null, childHandler)
-                        ?: ToastUtil.showToast(this@AndroidMediaApiActivity,"拍照异常")
+                    captureRequestBuilder.set(
+                        CaptureRequest.CONTROL_AF_MODE,
+                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+                    ) // 自动对焦
+                    captureRequestBuilder.set(
+                        CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH
+                    )     // 闪光灯
+                    captureRequestBuilder.set(
+                        CaptureRequest.JPEG_ORIENTATION,
+                        rotation
+                    )      //根据摄像头方向对保存的照片进行旋转，使其为"自然方向"
+                    mCameraCaptureSession?.capture(
+                        captureRequestBuilder.build(),
+                        null,
+                        childHandler
+                    )
+                        ?: ToastUtil.showToast(this@AndroidMediaApiActivity, "拍照异常")
                 }
 
             }
 
         }
     }
+
     private inner class texturListener : SurfaceTextureListener {
         override fun onSurfaceTextureSizeChanged(
             surface: SurfaceTexture?,
@@ -131,10 +147,11 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
             Log.i("TAGG", "onSurfaceTextureAvailable")
-            initCamera2(width,height)
+            initCamera2(width, height)
         }
 
     }
+
     private inner class SurfaceCallback : SurfaceHolder.Callback {
         override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
         }
@@ -157,7 +174,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
     }
 
-    private fun initCamera2(width: Int,height: Int) {
+    private fun initCamera2(width: Int, height: Int) {
 
         handlerThread.start()
         childHandler = Handler(handlerThread.looper)
@@ -181,60 +198,70 @@ open class AndroidMediaApiActivity : BaseActivity() {
         }
         try {
             for (cameraId in cameraManager.cameraIdList) {
+                Log.i("TAGG", "cameraId:$cameraId");
+
                 //描述相机设备的属性类
                 val characteristics =
                     cameraManager.getCameraCharacteristics(cameraId)
+
+
                 //获取是前置还是后置摄像头
                 val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
-
+                Log.i("TAGG", "facing:$facing");
                 //使用后置摄像头
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     val map =
                         characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                     if (map != null) {
-                        previewSize = CameraUtil.getOptimalSize(
-                            map.getOutputSizes(
-                                SurfaceTexture::class.java
-                            ), width, height
-                        )!!
-                        mCameraID = cameraId
-                        initImageReader()
+                        var sizeMap = map.getOutputSizes(SurfaceTexture::class.java)
+                        if (null != sizeMap) {
+                            previewSize = CameraUtil.getOptimalSize(
+                                sizeMap, width, height
+                            )!!
+
+                            mCameraID = cameraId
+                            initImageReader()
+                        }
                     }
                 }
                 //获取摄像头方向
-                mCameraSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
+                mCameraSensorOrientation =
+                    characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
 
             }
 
             Log.i("TAGG", "mCameraID:$mCameraID")
-            Log.i("TAGG", "previewSize:"+previewSize.height)
-            Log.i("TAGG", "previewSize:"+previewSize.width)
+            Log.i("TAGG", "previewSize:" + previewSize.height)
+            Log.i("TAGG", "previewSize:" + previewSize.width)
             cameraManager.openCamera(mCameraID, stateCallback(), mainHandler)
         } catch (r: CameraAccessException) {
-            Log.i("TAGG","CameraAccessException:"+r.message)
+            Log.i("TAGG", "CameraAccessException:" + r.message)
         }
-
 
 
     }
 
     private fun initImageReader() {
-        mImageReader = ImageReader.newInstance(previewSize.width, previewSize.height, ImageFormat.JPEG, 1)
+        mImageReader =
+            ImageReader.newInstance(previewSize.width, previewSize.height, ImageFormat.JPEG, 1)
         mImageReader.setOnImageAvailableListener(ImageReader.OnImageAvailableListener {
             val image = it.acquireNextImage()
             val byteBuffer = image.planes[0].buffer
             val byteArray = ByteArray(byteBuffer.remaining())
             byteBuffer.get(byteArray)
             it.close()
-            Log.i("TAGG","mCameraSensorOrientation: $mCameraSensorOrientation")
+            Log.i("TAGG", "mCameraSensorOrientation: $mCameraSensorOrientation")
             BitmapUtils.savePic(byteArray, true, { savedPath, time ->
                 this.runOnUiThread {
-                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存成功！ 保存路径：$savedPath 耗时：$time")
+                    ToastUtil.showToast(
+                        this@AndroidMediaApiActivity,
+                        "图片保存成功！ 保存路径：$savedPath 耗时：$time"
+                    )
                 }
             }, { msg ->
                 this.runOnUiThread {
-                    Log.i("TAGG","错误: $msg")
-                    ToastUtil.showToast(this@AndroidMediaApiActivity,"图片保存失败：$msg")
+                    Log.i("TAGG", "错误: $msg")
+                    ToastUtil.showToast(this@AndroidMediaApiActivity, "图片保存失败：$msg")
                 }
             })
         }, childHandler)
@@ -244,7 +271,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
         override fun onOpened(camera: CameraDevice) {
             mCameraDevice = camera
             //开启预览
-            Log.i("TAGG","StateCallback:")
+            Log.i("TAGG", "StateCallback:")
             takePreview();
         }
 
@@ -281,7 +308,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
 
     private inner class stateCallback1111 : CameraCaptureSession.StateCallback() {
         override fun onConfigureFailed(session: CameraCaptureSession) {
-            Log.i("TAGG","stateCallback1111:")
+            Log.i("TAGG", "stateCallback1111:")
         }
 
         override fun onConfigured(session: CameraCaptureSession) {
