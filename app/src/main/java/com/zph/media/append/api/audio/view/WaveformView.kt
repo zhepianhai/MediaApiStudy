@@ -36,7 +36,7 @@ class WaveformView : View {
     }
 
     fun initView() {
-        mWaveColor = Color.RED
+        mWaveColor = Color.parseColor("#d81e06")
         mBaseLineColor = Color.parseColor("#e5e5e5")
 
         waveStrokeWidth = 4f
