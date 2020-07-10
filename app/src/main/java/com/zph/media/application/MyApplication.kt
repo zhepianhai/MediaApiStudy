@@ -1,15 +1,27 @@
 package com.zph.media.application
 
-import android.app.Application
+import android.R
 import androidx.multidex.MultiDexApplication
+import com.iflytek.cloud.SpeechConstant
+import com.iflytek.cloud.SpeechUtility
 import com.qmuiteam.qmui.arch.QMUISwipeBackActivityManager
+
 
 class MyApplication : MultiDexApplication(){
     override fun onCreate() {
+        initSpeech()
         super.onCreate()
         QMUISwipeBackActivityManager.init(this)
-//        DoraemonKit.install(this,null,"pId");
-//        DoraemonKit.install(this,"41b8dc9c2837c4287c6a17c60754177d")
+
+
+    }
+    private fun initSpeech(){
+        val param = StringBuffer()
+        param.append("appid=58367e1d")
+        param.append(",")
+        // 设置使用v5+
+        param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC)
+        SpeechUtility.createUtility(this@MyApplication, param.toString())
     }
 
 }

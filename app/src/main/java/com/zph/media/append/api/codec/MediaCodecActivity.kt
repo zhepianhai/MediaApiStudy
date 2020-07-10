@@ -88,7 +88,7 @@ class MediaCodecActivity : BaseActivity() {
             var pcmSavePath =
                 Environment.getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_PCM_FILE_PATH
 
-            var saveFile = File(pcmSavePath + "/codec_test.pcm")
+            var saveFile = File("$pcmSavePath/codec_test.pcm")
             if (saveFile.exists())
                 saveFile.delete()
             saveFile.createNewFile()
@@ -96,7 +96,7 @@ class MediaCodecActivity : BaseActivity() {
 
             var aacSavePath =
                 Environment.getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_ACC_FILE_PATH
-            var aacFile = File(aacSavePath + "/codec_test.m4a")
+            var aacFile = File("$aacSavePath/codec_test.m4a")
             if (aacFile.exists())
                 aacFile.delete()
             aacFile.createNewFile()

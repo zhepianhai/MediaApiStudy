@@ -22,13 +22,15 @@
         android:name=".application.MyApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/icon"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".append.api.camera2.Camera2Test1Activity"></activity>
+        <activity android:name=".append.api.audio.AudioWaveformActivity"></activity>
+        <activity android:name=".append.opengles.TriangleActivity" />
+        <activity android:name=".append.api.camera2.Camera2Test1Activity" />
         <activity android:name=".append.api.codec.MediaCodecActivity" />
         <activity android:name=".append.api.MediaMuxerActivity" />
 

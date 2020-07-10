@@ -10,12 +10,14 @@ import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.media.ImageReader
+import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
+import android.view.Display
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.TextureView.SurfaceTextureListener
@@ -27,6 +29,7 @@ import com.zph.media.util.BitmapUtils
 import com.zph.media.util.CameraUtil
 import com.zph.media.util.ToastUtil
 import kotlinx.android.synthetic.main.activity_android_media_api.*
+import java.util.*
 
 
 /**
@@ -40,7 +43,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
     private lateinit var cameraManager: CameraManager
     private lateinit var childHandler: Handler
     private lateinit var mainHandler: Handler
-    private var mCameraID = "0" //摄像头Id 0 为后  1 为前
+    private var mCameraID = "0" //摄像头Id 0 为后  1为前
     private lateinit var mImageReader: ImageReader
     private lateinit var mCameraCaptureSession: CameraCaptureSession
     private lateinit var mCameraDevice: CameraDevice
@@ -49,16 +52,16 @@ open class AndroidMediaApiActivity : BaseActivity() {
     private val REQUEST_CAMERA_CODE = 100
     private val ORIENTATIONS = SparseIntArray()
     private var handlerThread = HandlerThread("Camera2")
-
+    private lateinit var videoSize: Size
+    private lateinit var previewSize: Size
     init {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
+        ORIENTATIONS.append(Surface.ROTATION_0, 90)
+        ORIENTATIONS.append(Surface.ROTATION_90, 0)
+        ORIENTATIONS.append(Surface.ROTATION_180, 270)
+        ORIENTATIONS.append(Surface.ROTATION_270, 180)
     }
 
     companion object {
-        var previewSize = Size(408, 640)
         open fun openActivity(activity: Activity) {
             val intent = Intent(activity, AndroidMediaApiActivity::class.java)
             activity.startActivity(intent)
@@ -87,7 +90,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
 //        mSurfaceHolder.set(true)
 //        mSurfaceHolder.addCallback(SurfaceCallback())
 //        mSurfaceHolder.setOnFrameAvailableListener {
-//            initCamera2();
+//            initCamera2()
 //        }
         mSufaceView.surfaceTextureListener = texturListener()
 
@@ -191,14 +194,14 @@ open class AndroidMediaApiActivity : BaseActivity() {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             var strings: Array<String> = arrayOf(Manifest.permission.CAMERA)
-            requestPermissions(strings, REQUEST_CAMERA_CODE);
+            requestPermissions(strings, REQUEST_CAMERA_CODE)
 
 
             return
         }
         try {
             for (cameraId in cameraManager.cameraIdList) {
-                Log.i("TAGG", "cameraId:$cameraId");
+                Log.i("TAGG", "cameraId:$cameraId")
 
                 //描述相机设备的属性类
                 val characteristics =
@@ -213,37 +216,44 @@ open class AndroidMediaApiActivity : BaseActivity() {
                         characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                     if (map != null) {
                         var sizeMap = map.getOutputSizes(SurfaceTexture::class.java)
-                        if (null != sizeMap) {
-                            //这个参数表明，获取的是对应surfaceTexture的输出分辨率，也就是对应textureView的分辨率
-                            //找到不为空的，才能设置对应显示实时的大小
-                            //从底层拿camera支持的previewsize，完了和屏幕分辨率做差，diff最小的就是最佳预览分辨率
+                        if (sizeMap == null) continue
+
+                        //这个参数表明，获取的是对应surfaceTexture的输出分辨率，也就是对应textureView的分辨率
+                        //找到不为空的，才能设置对应显示实时的大小
+                        //从底层拿camera支持的previewsize，完了和屏幕分辨率做差，diff最小的就是最佳预览分辨率
 
 
-//                            previewSize = CameraUtil.getOptimalSize(
-//                                sizeMap, width, height
-//                            )!!
-                            previewSize=CameraUtil.setPreviewSize(mSufaceView,characteristics)
-                            mCameraID = cameraId
-                            initImageReader()
-                        }
+                        videoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder::class.java))
+                        previewSize = CameraUtil.chooseOptimalSize(
+                            sizeMap, width, height,videoSize  )!!
+
+//                        previewSize = Collections.max(
+//                                Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+//                         CompareSizesByArea());
+//                        previewSize = CameraUtil.getOptimalSize(mSufaceView, characteristics)
+                        mCameraID = cameraId
+                        initImageReader()
+                        //获取摄像头方向
+                        mCameraSensorOrientation =
+                            characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
+                        Log.i("TAGG", "mCameraID:$mCameraID")
+                        Log.i("TAGG", "previewSize:" + previewSize.height)
+                        Log.i("TAGG", "previewSize:" + previewSize.width)
+                        cameraManager.openCamera(mCameraID, stateCallback(), mainHandler)
                     }
                 }
-                //获取摄像头方向
-                mCameraSensorOrientation =
-                    characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
 
             }
 
-            Log.i("TAGG", "mCameraID:$mCameraID")
-            Log.i("TAGG", "previewSize:" + previewSize.height)
-            Log.i("TAGG", "previewSize:" + previewSize.width)
-            cameraManager.openCamera(mCameraID, stateCallback(), mainHandler)
+
         } catch (r: CameraAccessException) {
             Log.i("TAGG", "CameraAccessException:" + r.message)
         }
 
 
     }
+    private fun chooseVideoSize(choices: Array<Size>) = choices.firstOrNull {
+        it.width == it.height * 4 / 3 && it.width <= 1080 } ?: choices[choices.size - 1]
 
     private fun initImageReader() {
         mImageReader =
@@ -276,7 +286,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
             mCameraDevice = camera
             //开启预览
             Log.i("TAGG", "StateCallback:")
-            takePreview();
+            takePreview()
         }
 
         override fun onDisconnected(camera: CameraDevice) {
@@ -300,7 +310,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
             val surfaceTexture: SurfaceTexture = mSufaceView.surfaceTexture
             surfaceTexture.setDefaultBufferSize(previewSize.width, previewSize.height)
             val previewSurface = Surface(surfaceTexture)
-            mSufaceView.setAspectRation(previewSize.width, previewSize.height);
+            mSufaceView.setAspectRation(previewSize.width, previewSize.height)
             previewRequestBuilder.addTarget(previewSurface);
             var strings = listOf<Surface>(previewSurface, mImageReader.surface)
             mCameraDevice.createCaptureSession(strings, stateCallback1111(), childHandler)
@@ -323,7 +333,7 @@ open class AndroidMediaApiActivity : BaseActivity() {
                 previewRequestBuilder.set(
                     CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
-                );
+                )
                 var previewRequest = previewRequestBuilder.build()
                 mCameraCaptureSession.setRepeatingRequest(previewRequest, null, childHandler)
             } catch (e: Exception) {

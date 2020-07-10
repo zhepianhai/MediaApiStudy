@@ -12,6 +12,8 @@ class Constants {
         const val ZPH_H246_FILE_PATH = "H264"
         const val ZPH_MP4_FILE_PATH = "Mp4"
         const val ZPH_PCM_FILE_PATH = "Pcm"
+        const val ZPH_WAV_FILE_PATH = "WAV"
+        const val ZPH_IFLY_WAV_FILE_PATH = "IFLY_WAV"
         const val ZPH_TEMP_PATH = "Temp"
         const val ZPH_OTHER_PATH = "Other"
         const val ZPH_CACHE_PATH = "Cache"

@@ -1,10 +1,12 @@
 package com.zph.media.util
 
+import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioRecord
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.lang.Exception
+import java.io.IOException
+import java.io.InputStream
 
 /**
  * 将pcm音频文件转换为wav音频文件
@@ -136,7 +138,6 @@ import java.lang.Exception
 
         }catch (e:Exception){}
     }
-
 
 
 }
