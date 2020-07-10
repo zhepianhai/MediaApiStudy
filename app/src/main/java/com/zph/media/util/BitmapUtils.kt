@@ -178,8 +178,19 @@ object BitmapUtils {
 //                matrix.postScale(-1f, 1f)
 //            }
             // 和预览画面相同的bitmap
-            var previewBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.getWidth(), originalBitmap.getHeight(), matrix, false);
-
+            var previewBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, false);
+            //存储YUV
+            val temp = System.currentTimeMillis()
+            var path =
+                Environment.getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_YUV_PATH
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            var picFile = File(path, timeStamp + "_image.yuv")
+            picFile.sink().buffer().write(toByteArray(previewBitmap)).close()
+            onSuccess("${picFile.absolutePath}", "${System.currentTimeMillis() - temp}")
+            Log.i(
+                "TAGG",
+                "图片已保存! 耗时：${System.currentTimeMillis() - temp}    路径：  ${picFile.absolutePath}"
+            )
         }
     }
 }

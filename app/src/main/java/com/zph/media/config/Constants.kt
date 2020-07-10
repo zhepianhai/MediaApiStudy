@@ -18,5 +18,6 @@ class Constants {
         const val ZPH_OTHER_PATH = "Other"
         const val ZPH_CACHE_PATH = "Cache"
         const val ZPH_SOURCE_PATH = "Source"
+        const val ZPH_YUV_PATH = "YUV"
     }
 }

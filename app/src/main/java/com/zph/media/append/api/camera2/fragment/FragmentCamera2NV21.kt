@@ -21,9 +21,12 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.zph.media.R
+import com.zph.media.util.BitmapUtils
 import com.zph.media.util.CameraUtil
 import com.zph.media.util.ToastUtil.Companion.showToast
-import kotlinx.android.synthetic.main.fragment_camera2_n_v21.*
+import kotlinx.android.synthetic.main.fragment_camera2_n_v21.btn_take_pic
+import kotlinx.android.synthetic.main.fragment_camera2_n_v21.mTextureView
+import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -124,7 +127,7 @@ class FragmentCamera2NV21 : Fragment() {
         btn_take_pic.setOnClickListener {
             //拍照
             if(mImageReader==null) initImageReader()
-//            takePicture()
+            takePicture()
         }
     }
     override fun onResume() {
@@ -152,6 +155,42 @@ class FragmentCamera2NV21 : Fragment() {
         backgroundThread?.start()
         backgroundHandler = Handler(backgroundThread?.looper)
     }
+
+    /**
+     * 拍照相关业务
+     * */
+    private fun takePicture(){
+        if (cameraDevice != null && mTextureView.isAvailable&&activity!=null) {
+            cameraDevice?.apply {
+                val captureRequestBuilder =
+                    createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+                captureRequestBuilder.addTarget(mImageReader?.surface!!)
+                val rotation = activity?.windowManager?.defaultDisplay?.rotation
+
+                captureRequestBuilder.set(
+                    CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+                ) // 自动对焦
+                captureRequestBuilder.set(
+                    CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH
+                )     // 闪光灯
+                captureRequestBuilder.set(
+                    CaptureRequest.JPEG_ORIENTATION,
+                    rotation
+                )      //根据摄像头方向对保存的照片进行旋转，使其为"自然方向"
+                captureSession?.capture(
+                    captureRequestBuilder.build(),
+                    null,
+                    backgroundHandler
+                )
+                    ?: showToast(activity, "拍照异常")
+            }
+
+        }
+
+    }
+
     @SuppressLint("MissingPermission")
     private fun openCamera(width: Int, height: Int) {
         val cameraActivity = activity
@@ -270,7 +309,7 @@ class FragmentCamera2NV21 : Fragment() {
 
     private fun initImageReader(){
         mImageReader =
-            ImageReader.newInstance(previewSize.width, previewSize.height, ImageFormat.YUV_420_888, 1)
+            ImageReader.newInstance(previewSize.width, previewSize.height, ImageFormat.YUV_420_888, 2)
         mImageReader?.setOnImageAvailableListener({
             val image = it.acquireNextImage()
             // Y:U:V == 4:2:2
@@ -299,6 +338,21 @@ class FragmentCamera2NV21 : Fragment() {
                      * @param previewSize  预览尺寸
                      * @param stride    步长
                      */
+                    BitmapUtils.saveYuv420_422(y,u!!,v!!,previewSize,planes[0].rowStride,
+                        { savedPath, time ->
+                            this.runOnUiThread {
+                                if(activity!=null) {
+                                    showToast(activity, "图片保存成功！ 保存路径：$savedPath 耗时：$time")
+                                    startPreview()
+                                }
+                            }
+                        }, { msg ->
+                            this.runOnUiThread {
+                                Log.i("TAGG", "错误: $msg")
+                                showToast(activity,  "图片保存失败：$msg")
+                                startPreview()
+                            }
+                        })
                 }
 
                 lock.unlock()
@@ -379,7 +433,7 @@ class FragmentCamera2NV21 : Fragment() {
     //连接的相机设备 回调相机状态发生变化时
     //以用于接收相机状态的更新和后续的处理。
     private val stateCallback = object : CameraDevice.StateCallback() {
-        override fun onOpened(camera: CameraDevice) {
+        override fun onOpened(cameraDevice: CameraDevice) {
             //当相机打开成功之后会回调此方法
             // 一般在此进行获取一个全局的CameraDevice实例，开启相机预览等操作
             cameraOpenCloseLock.release()
@@ -388,18 +442,18 @@ class FragmentCamera2NV21 : Fragment() {
             configureTransform(mTextureView.width, mTextureView.height)
         }
 
-        override fun onDisconnected(camera: CameraDevice) {
+        override fun onDisconnected(cameraDevice: CameraDevice) {
             //相机设备失去连接(不能继续使用)时回调此方法，同时当打开相机失败时也会调用此方法而不会调用onOpened()
             // 可在此关闭相机，清除CameraDevice引用
             cameraOpenCloseLock.release()
-            cameraDevice?.close()
+            cameraDevice.close()
             this@FragmentCamera2NV21.cameraDevice = null
         }
 
-        override fun onError(camera: CameraDevice, error: Int) {
+        override fun onError(cameraDevice: CameraDevice, error: Int) {
             //相机发生错误时调用此方法
             cameraOpenCloseLock.release()
-            cameraDevice?.close()
+            cameraDevice.close()
             this@FragmentCamera2NV21.cameraDevice = null
             activity?.finish()
         }

@@ -67,6 +67,7 @@ class MainActivity : BaseActivity() {
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_SOURCE_PATH)
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_WAV_FILE_PATH)
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_IFLY_WAV_FILE_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_YUV_PATH)
             //测试数据的视频源文件
             var fileTestMp4 =
                 File(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_SOURCE_PATH + "/test.mp4")
