@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.zph.media.R
+import com.zph.media.append.opengles.render.FGLView
 import com.zph.media.base.BaseActivity
 import kotlinx.android.synthetic.main.layout_navi.*
 
@@ -12,6 +13,13 @@ import kotlinx.android.synthetic.main.layout_navi.*
  *
  * */
 class TriangleActivity : BaseActivity() {
+    //坐标数据
+    var triangleCoords: FloatArray? = floatArrayOf(
+        0.5f, 0.5f, 0.0f,  // top
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        0.5f, -0.5f, 0.0f // bottom right
+    )
+
 
     companion object {
         open fun openActivity(activity: Activity) {
@@ -37,6 +45,8 @@ class TriangleActivity : BaseActivity() {
     }
 
     private fun init() {
+        var  mGLView= FGLView(this)
+
 
     }
 }

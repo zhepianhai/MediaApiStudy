@@ -184,8 +184,8 @@ object BitmapUtils {
             var path =
                 Environment.getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_YUV_PATH
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-            var picFile = File(path, timeStamp + "_image.yuv")
-            picFile.sink().buffer().write(toByteArray(previewBitmap)).close()
+            var picFile = File(path, timeStamp + "_image.jpg")
+            picFile.sink().buffer().write(toByteArray(originalBitmap)).close()
             onSuccess("${picFile.absolutePath}", "${System.currentTimeMillis() - temp}")
             Log.i(
                 "TAGG",

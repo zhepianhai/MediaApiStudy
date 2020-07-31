@@ -18,6 +18,7 @@ import com.zph.media.append.opengles.TriangleActivity
 import com.zph.media.base.BaseActivity
 import com.zph.media.config.Constants
 import com.zph.media.home.adapter.AdapterGridHome
+import com.zph.media.other.OtherActivity
 import com.zph.media.util.FileUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
@@ -107,6 +108,7 @@ class MainActivity : BaseActivity() {
         mData.add(7, "IPB帧")
         mData.add(8, "GL_三角形")
         mData.add(9, "音频波形")
+        mData.add(10, "CoinBene")
         adapter = AdapterGridHome(this, mData)
         gridview_home.adapter = adapter
         gridview_home.setOnItemClickListener { parent, view, position, id ->
@@ -131,8 +133,11 @@ class MainActivity : BaseActivity() {
                     8 -> {
                         TriangleActivity.openActivity(this)
                     }
-                    9->{
+                    9 -> {
                         AudioWaveformActivity.openActivity(this)
+                    }
+                    10 -> {
+                        OtherActivity.openActivity(this)
                     }
                     else -> {
 

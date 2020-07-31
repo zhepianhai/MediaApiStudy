@@ -8,9 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import com.zph.media.R
-import com.zph.media.append.api.camera2.fragment.Camera2VideoFragment
-import com.zph.media.append.api.camera2.fragment.FragmentCamera2NV21
-import com.zph.media.append.api.camera2.fragment.FragmentCamera2Video
+import com.zph.media.append.api.camera2.fragment.*
 import com.zph.media.base.BaseActivity
 
 
@@ -60,7 +58,9 @@ open class Camera2Test1Activity : BaseActivity() {
     private fun initFrameLayout() {
         var supportFragmentManager = supportFragmentManager
         var fragmentTransaction = supportFragmentManager.beginTransaction()
-        fragmentTransaction.add(R.id.frameLayout, FragmentCamera2NV21.newInstance()).commit()
+//        fragmentTransaction.add(R.id.frameLayout, FragmentCamera2NV21.newInstance()).commit()
+//        fragmentTransaction.add(R.id.frameLayout, FragmentCamera2SurfaceView.newInstance()).commit()
+        fragmentTransaction.add(R.id.frameLayout, TestFragment.newInstance()).commit()
     }
 
 

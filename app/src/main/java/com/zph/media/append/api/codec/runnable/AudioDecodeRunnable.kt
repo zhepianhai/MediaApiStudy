@@ -27,7 +27,7 @@ class AudioDecodeRunnable(
     val TIMEOUT_USEC = 0
     var extractor: MediaExtractor
     var audioTrack = 0
-    lateinit var mListener: AudioCodec.DecodeOverListener
+    var mListener: AudioCodec.DecodeOverListener
     private var mPcmFilePath: String? = null
 
     init {
@@ -56,8 +56,16 @@ class AudioDecodeRunnable(
             var fos=FileOutputStream(mPcmFilePath)
 
             while (!codeOver){
+//                首先向mediacodec放入数据
+                //dequeueInputBuffer方法返回值大于-1时，表示输入可用
+                //
+                //getInputBuffer：获取输入buffer，数据放入这个里面
+                //
+                //queueInputBuffer：通知中间处理过程，去处理数据
+                //
+
                 if (!inputDone) {
-                    repeat(inputBuffers.size) { i ->
+                    repeat(inputBuffers.size) { _ ->
                         //将数据传入之后，再去输出端取出数据
                         val inputIndex = audioCodec.dequeueInputBuffer(TIMEOUT_USEC.toLong())
                         if (inputIndex > 0) {
@@ -65,6 +73,7 @@ class AudioDecodeRunnable(
                             var inputBuffer: ByteBuffer =
                                 inputBuffers[inputIndex] //拿到inputBuffer，新的API中好像可以直接拿到
                             inputBuffer.clear()
+                            //MediaExtractor读取数据
                             var sampleSize = extractor.readSampleData(
                                 inputBuffer,
                                 0
@@ -80,7 +89,7 @@ class AudioDecodeRunnable(
                             } else {
                                 inputInfo.offset = 0;
                                 inputInfo.size = sampleSize;
-                                inputInfo.flags = MediaCodec.BUFFER_FLAG_SYNC_FRAME;
+                                inputInfo.flags = MediaCodec.BUFFER_FLAG_SYNC_FRAME
                                 inputInfo.presentationTimeUs = extractor.getSampleTime();
 
                                 Log.e("TAG", "往解码器写入数据，当前时间戳：" + inputInfo.presentationTimeUs);
@@ -98,6 +107,12 @@ class AudioDecodeRunnable(
                         }
                     }
                 }
+//                然后取出数据，（注意：放入一次数据，取出时数据次数不定），需要多次取，
+//                直到这次放入的数据没有没有对应的输出
+//                dequeueOutputBuffer：结果大于-1时，表示有输出数据
+//                getOutputBuffer：输出buffer，数据在这里面，dequeueOutputBuffer这里面参数info是buffer中的数据信息
+//                releaseOutputBuffer：释放buffer
+
                 var decodeOutputDone = false
                 var chunkPCM: ByteArray
                 while (!decodeOutputDone){
@@ -112,8 +127,7 @@ class AudioDecodeRunnable(
                         val newFormat = audioCodec.outputFormat
                     } else if (outputIndex < 0) {
                     } else {
-                        var outputBuffer: ByteBuffer?
-                        outputBuffer = if (Build.VERSION.SDK_INT >= 21) {
+                        var outputBuffer: ByteBuffer? = if (Build.VERSION.SDK_INT >= 21) {
                             audioCodec.getOutputBuffer(outputIndex)
                         } else {
                             outputBuffers[outputIndex]

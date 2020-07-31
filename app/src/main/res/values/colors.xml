@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#6200EE</color>
-    <color name="colorWrite">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="white">#ffffff</color>
@@ -9,4 +8,13 @@
     <color name="line_color">#cccccc</color>
     <color name="line_color2">#e5e5e5</color>
     <color name="background">#f4f4f4</color>
+
+
+
+
+    <color name="colorRed">#FE2B54</color>
+    <color name="colorRed_d">#f26480</color>
+
+    <color name="colorWrite">#FFFFFF</color>
+    <color name="colorWrite_d">#D0D0D0</color>
 </resources>

@@ -111,6 +111,7 @@ class MediaExtractorActivity : BaseActivity() {
                     var inputBuffer = ByteBuffer.allocate(100 * 1024)
                     var fe = FileOutputStream(file1, true)
                     while (true) {
+                        //medaiExtractor读取数据
                         var readSampleCount = mediaExtractor.readSampleData(inputBuffer, 0)
                         if (readSampleCount < 0) break
                         var buffer = ByteArray(readSampleCount)

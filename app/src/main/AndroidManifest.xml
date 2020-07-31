@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!-- Tell the system this app requires OpenGL ES 2.0. -->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -28,7 +30,8 @@
         android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".append.api.audio.AudioWaveformActivity"></activity>
+        <activity android:name=".other.OtherActivity"></activity>
+        <activity android:name=".append.api.audio.AudioWaveformActivity" />
         <activity android:name=".append.opengles.TriangleActivity" />
         <activity android:name=".append.api.camera2.Camera2Test1Activity" />
         <activity android:name=".append.api.codec.MediaCodecActivity" />

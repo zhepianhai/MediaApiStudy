@@ -31,7 +31,7 @@ class AudioCodec {
         /**
          * 将音频文件解码成原始的PCM数据
          * */
-        public fun getPCMFromAudio(mp3SourcePath:String ,pcmSavePath:String,listener:AudioDecodeListener){
+         fun getPCMFromAudio(mp3SourcePath:String ,pcmSavePath:String,listener:AudioDecodeListener){
 
             var extractor=MediaExtractor()//此类可分离视频文件的音轨和视频轨道
             var audioTrack=-1//音频MP3文件其实只有一个音轨
@@ -50,9 +50,6 @@ class AudioCodec {
                 if(hasAudio){
                     extractor.selectTrack(audioTrack)
                     //原始的音频解码
-                    //原始音频解码
-
-                    //原始音频解码
                     Thread(
                         AudioDecodeRunnable(
                             extractor,
@@ -61,9 +58,7 @@ class AudioCodec {
                             object : DecodeOverListener {
                                 override fun decodeIsOver() {
                                     handler.post(Runnable {
-                                        if (listener != null) {
-                                            listener.decodeOver()
-                                        }
+                                        listener?.decodeOver()
                                     })
                                 }
 
@@ -146,7 +141,7 @@ class AudioCodec {
     }
 
 
-    public interface DecodeOverListener {
+     interface DecodeOverListener {
         fun decodeIsOver()
         fun decodeFail()
     }
@@ -154,7 +149,7 @@ class AudioCodec {
     /**
      * 音频解码监听器：监听是否解码成功
      */
-    public interface AudioDecodeListener {
+     interface AudioDecodeListener {
         fun decodeOver()
         fun decodeFail()
     }

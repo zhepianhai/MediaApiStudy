@@ -19,7 +19,9 @@
             android:background="@color/line_color"
             tools:ignore="MissingConstraints" />
 
-
+        <com.zph.media.append.opengles.render.FGLView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
 
     </LinearLayout>

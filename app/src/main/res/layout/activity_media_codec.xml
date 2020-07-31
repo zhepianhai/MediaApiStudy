@@ -32,7 +32,7 @@
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:layout_height="wrap_content"
-                    android:text="音频 AAC 硬编、硬解"/>
+                    android:text="音频 PCM 硬编、硬解"/>
                 <RadioButton
                     android:id="@+id/rb_media_codec"
                     android:layout_width="0dp"
