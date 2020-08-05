@@ -36,7 +36,9 @@ class MainActivity : BaseActivity() {
             activity.startActivity(intent)
         }
     }
-
+    init {
+        System.loadLibrary("native-lib")
+    }
     override fun getLayoutId(): Int {
         return R.layout.activity_main
     }
@@ -49,9 +51,9 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         initFile()
         initGridView()
-
+        Log.i("TAGG","lame版本号是："+stringFromJNI())
     }
-
+    external fun stringFromJNI(): String
     private fun initFile() {
         if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
             //文件创建

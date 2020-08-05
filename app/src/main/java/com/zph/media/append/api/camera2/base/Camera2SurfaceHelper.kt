@@ -210,11 +210,14 @@ class Camera2SurfaceHelper(private val activity: Activity, private val surfaceVi
         }
         return videoPath
     }
+
+
     private fun startBackgroundThread(){
         backgroundThread = HandlerThread("CameraBackground")
         backgroundThread?.start()
         backgroundHandler = Handler(backgroundThread?.looper)
     }
+
 
     //打开
     @SuppressLint("MissingPermission")

@@ -18,8 +18,20 @@ android {
             //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
             abiFilters "armeabi-v7a"
         }
+        externalNativeBuild {
+            cmake {
+                cFlags "-DSTDC_HEADERS"
+            }
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
+        }
     }
-
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
     buildTypes {
         debug {
             minifyEnabled false
