@@ -4,8 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.zph.media.R
-import com.zph.media.append.opengles.render.FGLView
+import com.zph.media.append.opengles.drawer.IDrawer
+import com.zph.media.append.opengles.drawer.TriangleDrawer
+import com.zph.media.append.opengles.render.SimpleRender
 import com.zph.media.base.BaseActivity
+import kotlinx.android.synthetic.main.activity_triangle.*
 import kotlinx.android.synthetic.main.layout_navi.*
 
 /**
@@ -13,16 +16,10 @@ import kotlinx.android.synthetic.main.layout_navi.*
  *
  * */
 class TriangleActivity : BaseActivity() {
-    //坐标数据
-    var triangleCoords: FloatArray? = floatArrayOf(
-        0.5f, 0.5f, 0.0f,  // top
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        0.5f, -0.5f, 0.0f // bottom right
-    )
-
+    private lateinit var drawer: IDrawer
 
     companion object {
-        open fun openActivity(activity: Activity) {
+        fun openActivity(activity: Activity) {
             val intent = Intent(activity, TriangleActivity::class.java)
             activity.startActivity(intent)
         }
@@ -33,10 +30,12 @@ class TriangleActivity : BaseActivity() {
     }
 
     override fun initTopBar() {
-        tv_title.text = "MediaPlay"
+        tv_title.text = "OpenGL三角形"
         lay_back.setOnClickListener {
             finish()
         }
+        // 11 14 16 21 22
+        // 07 13 14 28 29
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +44,19 @@ class TriangleActivity : BaseActivity() {
     }
 
     private fun init() {
-        var  mGLView= FGLView(this)
-
-
+        drawer=TriangleDrawer()
+        initRender(drawer)
     }
+    private fun initRender(drawer: IDrawer) {
+        gl_surface.setEGLContextClientVersion(2)
+        val render = SimpleRender()
+        render.addDrawer(drawer)
+        gl_surface.setRenderer(render)
+    }
+    override fun onDestroy() {
+        drawer.release()
+        super.onDestroy()
+    }
+
+
 }

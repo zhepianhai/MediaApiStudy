@@ -19,7 +19,8 @@
             android:background="@color/line_color"
             tools:ignore="MissingConstraints" />
 
-        <com.zph.media.append.opengles.render.FGLView
+        <android.opengl.GLSurfaceView
+            android:id="@+id/gl_surface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

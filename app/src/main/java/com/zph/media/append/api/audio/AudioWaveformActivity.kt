@@ -20,6 +20,7 @@ import com.zph.media.config.Constants
 import com.zph.media.util.JsonParser.parseIatResult
 import com.zph.media.util.PcmToWavUtil
 import com.zph.media.util.ToastUtil
+import com.zph.media.util.ZPHLameUtils
 import kotlinx.android.synthetic.main.activity_audio_waveform.*
 import kotlinx.android.synthetic.main.layout_navi.*
 import org.json.JSONObject
@@ -48,7 +49,9 @@ class AudioWaveformActivity : BaseActivity() {
     //语音识别的相关
     // 语音听写对象
     private var mIat: SpeechRecognizer? = null
-
+    init {
+        System.loadLibrary("native-lib")
+    }
     companion object {
         open fun openActivity(activity: Activity) {
             val intent = Intent(activity, AudioWaveformActivity::class.java)
@@ -73,7 +76,9 @@ class AudioWaveformActivity : BaseActivity() {
         mIat = SpeechRecognizer.createRecognizer(this, null)
         setParam()
     }
+    open fun setConvertProgress(progrss:Int){
 
+    }
     private fun checkPermissions() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -205,6 +210,8 @@ class AudioWaveformActivity : BaseActivity() {
         pcmToWavUtil.pcmToWav(pcmFile.absolutePath, wavFile.absolutePath)
         currentFilePathWav = wavFile.absolutePath
         ToastUtil.showToast(this@AudioWaveformActivity, "转换完成！")
+
+        Log.i("TAGG","--->version:"+ZPHLameUtils.getLameVersion());
     }
 
     /**

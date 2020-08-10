@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.getExternalStorageDirectory
 import android.util.Log
-import com.qmuiteam.qmui.widget.dialog.QMUITipDialog
 import com.zph.media.append.api.AndroidAudioApiActivity
-import com.zph.media.append.api.AndroidMediaApiActivity
 import com.zph.media.append.api.MediaExtractorActivity
 import com.zph.media.append.api.MediaMuxerActivity
 import com.zph.media.append.api.audio.AudioWaveformActivity
@@ -22,8 +20,10 @@ import com.zph.media.other.OtherActivity
 import com.zph.media.util.FileUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
+import kotlin.random.Random
 
 
+@Suppress("DEPRECATION")
 class MainActivity : BaseActivity() {
 
     private var adapter: AdapterGridHome? = null
@@ -36,9 +36,7 @@ class MainActivity : BaseActivity() {
             activity.startActivity(intent)
         }
     }
-    init {
-        System.loadLibrary("native-lib")
-    }
+
     override fun getLayoutId(): Int {
         return R.layout.activity_main
     }
@@ -51,9 +49,8 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         initFile()
         initGridView()
-        Log.i("TAGG","lame版本号是："+stringFromJNI())
     }
-    external fun stringFromJNI(): String
+
     private fun initFile() {
         if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
             //文件创建

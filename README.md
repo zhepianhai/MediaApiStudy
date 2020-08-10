@@ -45,3 +45,15 @@
  它独创的心理音响模型技术保证了CD音频还原的真实性，配合VBR和ABR参数，音质几乎可以媲美CD音频，
  但文件体积却非常小。
 
+下面是一些推荐的参考资料：
+
+    1. 《雷霄骅的专栏》：http://blog.csdn.net/leixiaohua1020
+
+    2. 《Android音频开发》：http://ticktick.blog.51cto.com/823160/d-15
+
+    3. 《FFMPEG Tips》：http://ticktick.blog.51cto.com/823160/d-17
+
+    4. 《Learn OpenGL 中文》：https://learnopengl-cn.readthedocs.io/zh/latest/
+
+    5. 《Android Graphic 架构》：https://source.android.com/devices/graphics/
+
