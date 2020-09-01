@@ -10,7 +10,11 @@ class TriangleDrawer : IDrawer {
     private val mVertexCoors = floatArrayOf(
         -1f, -1f,
         1f, -1f,
-        0f, 1f
+        0f, 0f,
+
+        -1f, 1f,
+        1f, 1f,
+        0f, 0f
     )
 
     // 纹理坐标
@@ -18,6 +22,7 @@ class TriangleDrawer : IDrawer {
         0f, 1f,
         1f, 1f,
         0.5f, 0f
+
     )
 
     //纹理ID
@@ -70,13 +75,14 @@ class TriangleDrawer : IDrawer {
             //【步骤3: 开始渲染绘制】
             doDraw()
         }
+
     }
     private fun createGLPrg() {
         if (mProgram == -1) {
             val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getVertexShader())
             val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getFragmentShader())
 
-            //创建OpenGL ES程序，注意：需要在OpenGL渲染线程中创建，否则无法渲染
+            //创建OpenGL E'S程序，注意：需要在OpenGL渲染线程中创建，否则无法渲染
             mProgram = GLES20.glCreateProgram()
             //将顶点着色器加入到程序
             GLES20.glAttachShader(mProgram, vertexShader)
@@ -100,7 +106,7 @@ class TriangleDrawer : IDrawer {
         GLES20.glVertexAttribPointer(mVertexPosHandler, 2, GLES20.GL_FLOAT, false, 0, mVertexBuffer)
         GLES20.glVertexAttribPointer(mTexturePosHandler, 2, GLES20.GL_FLOAT, false, 0, mTextureBuffer)
         //开始绘制
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 3)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 6)
     }
     override fun setTextureID(id: Int) {
         mTextureId = id
@@ -126,7 +132,7 @@ class TriangleDrawer : IDrawer {
     private fun getFragmentShader(): String {
         return "precision mediump float;" +
                 "void main() {" +
-                "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);" +
+                "  gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);" +
                 "}"
     }
 

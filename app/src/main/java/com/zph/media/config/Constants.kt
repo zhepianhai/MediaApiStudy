@@ -19,5 +19,6 @@ class Constants {
         const val ZPH_CACHE_PATH = "Cache"
         const val ZPH_SOURCE_PATH = "Source"
         const val ZPH_YUV_PATH = "YUV"
+        const val ZPH_GPUIMAGE_PATH = "GPUImage"
     }
 }

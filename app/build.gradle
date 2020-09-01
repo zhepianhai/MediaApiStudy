@@ -13,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
             //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
@@ -80,6 +81,9 @@ dependencies {
     implementation files('libs/lfasr-sdk-3.0.0.jar')
     //json
     implementation 'com.alibaba:fastjson:1.1.46.android'
+    //gpuImage
+    implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
+
 
 }
 //dokitExt {

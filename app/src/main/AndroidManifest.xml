@@ -30,7 +30,10 @@
         android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".append.ffmpeg.FfmpegOneActivity"></activity>
+        <activity android:name=".append.gpuimage.GupCameraActivity"></activity>
+        <activity android:name=".append.gpuimage.GalleryActivity" />
+        <activity android:name=".append.gpuimage.GpuImageTestActivity" />
+        <activity android:name=".append.ffmpeg.FfmpegOneActivity" />
         <activity android:name=".other.OtherActivity" />
         <activity android:name=".append.api.audio.AudioWaveformActivity" />
         <activity android:name=".append.opengles.TriangleActivity" />

@@ -12,6 +12,7 @@ import com.zph.media.append.api.MediaMuxerActivity
 import com.zph.media.append.api.audio.AudioWaveformActivity
 import com.zph.media.append.api.camera2.Camera2Test1Activity
 import com.zph.media.append.api.codec.MediaCodecActivity
+import com.zph.media.append.gpuimage.GpuImageTestActivity
 import com.zph.media.append.opengles.TriangleActivity
 import com.zph.media.base.BaseActivity
 import com.zph.media.config.Constants
@@ -68,6 +69,7 @@ class MainActivity : BaseActivity() {
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_WAV_FILE_PATH)
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_IFLY_WAV_FILE_PATH)
             FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_YUV_PATH)
+            FileUtil.create(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_GPUIMAGE_PATH)
             //测试数据的视频源文件
             var fileTestMp4 =
                 File(getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_SOURCE_PATH + "/test.mp4")
@@ -108,6 +110,7 @@ class MainActivity : BaseActivity() {
         mData.add(8, "GL_三角形")
         mData.add(9, "音频波形")
         mData.add(10, "CoinBene")
+        mData.add(11, "GPUImage")
         adapter = AdapterGridHome(this, mData)
         gridview_home.adapter = adapter
         gridview_home.setOnItemClickListener { parent, view, position, id ->
@@ -137,6 +140,9 @@ class MainActivity : BaseActivity() {
                     }
                     10 -> {
                         OtherActivity.openActivity(this)
+                    }
+                    11 -> {
+                        GpuImageTestActivity.openActivity(this)
                     }
                     else -> {
 

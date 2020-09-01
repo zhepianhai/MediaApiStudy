@@ -34,8 +34,6 @@ class TriangleActivity : BaseActivity() {
         lay_back.setOnClickListener {
             finish()
         }
-        // 11 14 16 21 22
-        // 07 13 14 28 29
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

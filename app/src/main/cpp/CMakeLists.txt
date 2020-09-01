@@ -27,7 +27,5 @@
 
 add_library(native-lib
              SHARED
-             native-lib.cpp bitstream.c encoder.c gain_analysis.c lame.c id3tag.c
-             mpglib_interface.c newmdct.c presets.c psymodel.c quantize.c fft.c
-             quantize_pvt.c reservoir.c set_get.c tables.c takehiro.c util.c
-             vbrquantize.c VbrTag.c version.c)
+             native-lib.cpp
+        )
