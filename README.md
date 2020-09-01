@@ -48,6 +48,8 @@
 
 2. Ffmpeg:
    通过：CentOS Linux和 android-ndk-r20b-linux-x86_64和ffmpeg-4.2.2交叉编译后生成的静态库文件和动态库文件
+
+
 下面是一些推荐的参考资料：
 
     1. 《雷霄骅的专栏》：http://blog.csdn.net/leixiaohua1020
