@@ -21,11 +21,10 @@ android {
         }
         externalNativeBuild {
             cmake {
-                cFlags "-DSTDC_HEADERS"
+                cppFlags "-frtti -fexceptions"
+                abiFilters "armeabi-v7a" //指定编译为 armeabi-v7a
             }
-            ndk {
-                abiFilters "armeabi-v7a"
-            }
+
         }
     }
     externalNativeBuild {
@@ -44,7 +43,7 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['libs']
+            jniLibs.srcDirs = ['src/main/jniLibs']
         }
     }
 }

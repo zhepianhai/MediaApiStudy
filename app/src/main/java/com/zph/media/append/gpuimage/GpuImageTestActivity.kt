@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.View
 import com.zph.media.R
 import com.zph.media.base.BaseActivity
+import kotlinx.android.synthetic.main.activity_gpu_image_test.*
 import kotlinx.android.synthetic.main.layout_navi.*
 
 class GpuImageTestActivity : BaseActivity() {
@@ -15,7 +16,9 @@ class GpuImageTestActivity : BaseActivity() {
             activity.startActivity(intent)
         }
     }
-
+    init {
+        System.loadLibrary("native-lib");
+    }
     override fun getLayoutId(): Int {
         return R.layout.activity_gpu_image_test
     }
@@ -37,5 +40,12 @@ class GpuImageTestActivity : BaseActivity() {
         findViewById<View>(R.id.button_camera).setOnClickListener {
             startActivity(Intent(this, GupCameraActivity::class.java))
         }
+
+        tv_ffmpeg_version.text=getFFmpegVersion()
     }
+
+    /**
+     * @return 返回当前
+     */
+    private external fun getFFmpegVersion(): String
 }

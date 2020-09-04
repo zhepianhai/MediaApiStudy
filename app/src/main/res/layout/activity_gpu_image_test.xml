@@ -28,5 +28,14 @@
             android:drawableTop="@android:drawable/ic_menu_camera"
             android:text="Camera"
             tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/tv_ffmpeg_version"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:text=""
+            android:layout_marginTop="30dp"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

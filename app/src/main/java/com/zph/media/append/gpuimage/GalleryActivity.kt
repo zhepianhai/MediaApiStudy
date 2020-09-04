@@ -11,7 +11,6 @@ import com.zph.media.config.Constants
 import com.zph.media.append.gpuimage.utils.GPUImageFilterTools
 import jp.co.cyberagent.android.gpuimage.GPUImageView
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageFilter
-import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools
 import kotlinx.android.synthetic.main.layout_navi.*
 import java.io.File
 
@@ -22,8 +21,8 @@ class GalleryActivity : BaseActivity() {
     }
 
     private var filterAdjuster: GPUImageFilterTools.FilterAdjuster? = null
-    private val gpuImageView: GPUImageView by lazy { findViewById(R.id.gpuimage) }
-    private val seekBar: SeekBar by lazy { findViewById(R.id.seekBar) }
+    private val gpuImageView: GPUImageView by lazy { findViewById<GPUImageView>(R.id.gpuimage) }
+    private val seekBar: SeekBar by lazy { findViewById<SeekBar>(R.id.seekBar) }
 
 
 
