@@ -10,10 +10,13 @@ import com.zph.media.append.api.AndroidAudioApiActivity
 import com.zph.media.append.api.MediaExtractorActivity
 import com.zph.media.append.api.MediaMuxerActivity
 import com.zph.media.append.api.audio.AudioWaveformActivity
+import com.zph.media.append.api.audio.LameTestActivity
 import com.zph.media.append.api.camera2.Camera2Test1Activity
 import com.zph.media.append.api.codec.MediaCodecActivity
+import com.zph.media.append.bezier_curve.BezierCurveActivity
 import com.zph.media.append.gpuimage.GpuImageTestActivity
 import com.zph.media.append.opengles.TriangleActivity
+import com.zph.media.append.webrtc.WebRtcActivity
 import com.zph.media.base.BaseActivity
 import com.zph.media.config.Constants
 import com.zph.media.home.adapter.AdapterGridHome
@@ -111,6 +114,9 @@ class MainActivity : BaseActivity() {
         mData.add(9, "音频波形")
         mData.add(10, "CoinBene")
         mData.add(11, "GPUImage")
+        mData.add(12, "WebRtc")
+        mData.add(13, "贝塞尔曲线")
+        mData.add(14, "Lame使用")
         adapter = AdapterGridHome(this, mData)
         gridview_home.adapter = adapter
         gridview_home.setOnItemClickListener { parent, view, position, id ->
@@ -143,6 +149,15 @@ class MainActivity : BaseActivity() {
                     }
                     11 -> {
                         GpuImageTestActivity.openActivity(this)
+                    }
+                    12 -> {
+                        WebRtcActivity.openActivity(this)
+                    }
+                    13 -> {
+                        BezierCurveActivity.openActivity(this)
+                    }
+                    14 -> {
+                        LameTestActivity.openActivity(this)
                     }
                     else -> {
 

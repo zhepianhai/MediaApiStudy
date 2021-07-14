@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">MediaApiStudy</string>
+    <string name="app_name">MAS</string>
+    <string name="app_name_all">Media APi Study</string>
+    <string name="app_author">Media By ZhePianHai</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

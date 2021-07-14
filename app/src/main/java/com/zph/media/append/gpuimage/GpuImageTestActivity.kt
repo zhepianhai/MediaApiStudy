@@ -2,6 +2,7 @@ package com.zph.media.append.gpuimage
 
 import android.app.Activity
 import android.content.Intent
+import android.media.MediaPlayer
 import android.view.View
 import com.zph.media.R
 import com.zph.media.base.BaseActivity
@@ -17,7 +18,8 @@ class GpuImageTestActivity : BaseActivity() {
         }
     }
     init {
-        System.loadLibrary("native-lib");
+//        System.loadLibrary("ffmpeg-lib")
+        System.loadLibrary("native-lib")
     }
     override fun getLayoutId(): Int {
         return R.layout.activity_gpu_image_test
@@ -32,7 +34,7 @@ class GpuImageTestActivity : BaseActivity() {
     }
 
     private fun initView() {
-
+        //wise-8127
         findViewById<View>(R.id.button_gallery).setOnClickListener {
             startActivity(Intent(this, GalleryActivity::class.java))
         }
@@ -42,6 +44,7 @@ class GpuImageTestActivity : BaseActivity() {
         }
 
         tv_ffmpeg_version.text=getFFmpegVersion()
+
     }
 
     /**

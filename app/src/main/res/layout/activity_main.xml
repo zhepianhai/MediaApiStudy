@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/qmui_topbar_height"
             android:gravity="center"
-            android:text="@string/app_name"
+            android:text="@string/app_name_all"
             android:textSize="16sp"/>
 
         <View

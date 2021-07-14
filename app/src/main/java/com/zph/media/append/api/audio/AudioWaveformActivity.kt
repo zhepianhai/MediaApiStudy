@@ -50,7 +50,7 @@ class AudioWaveformActivity : BaseActivity() {
     // 语音听写对象
     private var mIat: SpeechRecognizer? = null
     init {
-        System.loadLibrary("native-lib")
+//        System.loadLibrary("native-lib")
     }
     companion object {
         open fun openActivity(activity: Activity) {
@@ -156,7 +156,8 @@ class AudioWaveformActivity : BaseActivity() {
                 if (AudioRecord.ERROR_INVALID_OPERATION != read) {
                     try {
                         os!!.write(data)
-                        waveformView.addData(getShort(data))
+//                        waveformView.addData(getShort(data))
+                        audioWaveView.setWaveData(data)
                     } catch (e: Exception) {
                     }
                 }
@@ -227,11 +228,15 @@ class AudioWaveformActivity : BaseActivity() {
             ToastUtil.showToast(this@AudioWaveformActivity, "Wav音频不存在！")
             return
         }
-        standard()
+//        standard()
+        standard1()
 
 
     }
+    private fun standard1(){
 
+
+    }
     @Throws(InterruptedException::class)
     private fun standard() {
         // 初始化识别无UI识别对象
@@ -313,8 +318,8 @@ class AudioWaveformActivity : BaseActivity() {
         for (key in mIatResults.keys) {
             sb.append(mIatResults[key])
         }
-        tv_sppech.setText(sb.toString())
-        tv_sppech.setSelection(tv_sppech.length())
+//        tv_sppech.setText(sb.toString())
+//        tv_sppech.setSelection(tv_sppech.length())
     }
     /**
      * 初始化监听器。

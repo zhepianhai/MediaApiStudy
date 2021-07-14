@@ -84,7 +84,7 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun defaultLoadMain() {
-       handler.sendEmptyMessageDelayed(FLAG_WHAT,2000)
+       handler.sendEmptyMessageDelayed(FLAG_WHAT,4000)
     }
     private fun intoMainActivity(){
         MainActivity.openActivity(this)

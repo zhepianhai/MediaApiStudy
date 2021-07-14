@@ -31,7 +31,9 @@ import java.lang.Exception
 /**
  *
  * AudioTrack是什么？ 
-AudioRecord是可以播放原始音频数据pcm的api，pcm一般的播放器都是无法播放的，AudioRecord可以播放pcm，不过需要制定播放时候的采样率、声道数位宽，现在在android下面做了一个demo，主要是播放pcm录音文件。pcm录音时候需要制定几个重要参数，播放的时候还需要设置录制缓冲区大小，缓存区越大，内存溢出风险越小。
+AudioRecord是可以播放原始音频数据pcm的api，
+pcm一般的播放器都是无法播放的，AudioRecord可以播放pcm，不过需要制定播放时候的采样率、声道数位宽，
+现在在android下面做了一个demo，主要是播放pcm录音文件。pcm录音时候需要制定几个重要参数，播放的时候还需要设置录制缓冲区大小，缓存区越大，内存溢出风险越小。
 
 pcm参数：
 1、采样率 
@@ -172,6 +174,9 @@ class AndroidAudioApiActivity : BaseActivity() {
         }
         if(file.exists()){
             file.delete()
+        }
+        if(audioRecord.state==AudioRecord.STATE_UNINITIALIZED){
+            throw RuntimeException("the audioRecord is not uninitialized")
         }
         audioRecord.startRecording()
         isRecording=true
