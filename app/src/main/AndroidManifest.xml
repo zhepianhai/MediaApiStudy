@@ -30,7 +30,8 @@
         android:roundIcon="@mipmap/icon_new"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".append.api.audio.LameTestActivity"></activity>
+        <activity android:name=".append.ndk.NdkTest1Activity"></activity>
+        <activity android:name=".append.api.audio.LameTestActivity" />
         <activity android:name=".append.bezier_curve.BezierCurveActivity" />
         <activity android:name=".append.webrtc.WebRtcActivity" />
         <activity android:name=".append.gpuimage.GupCameraActivity" />

@@ -24,4 +24,6 @@ abstract class BaseActivity : QMUIActivity() {
         QMUIStatusBarHelper.translucent(this)
         QMUIStatusBarHelper.setStatusBarLightMode(this)
     }
+
+
 }
