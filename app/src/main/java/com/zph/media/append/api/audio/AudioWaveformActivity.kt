@@ -1,12 +1,11 @@
 package com.zph.media.append.api.audio
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.AudioRecord
-import android.media.AudioTrack
-import android.media.MediaRecorder
+import android.media.*
 import android.os.Bundle
 import android.os.Environment
 import android.text.TextUtils
@@ -14,6 +13,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.iflytek.cloud.*
 import com.zph.media.R
+import com.zph.media.append.api.audio.view.AudioTrackManager
 import com.zph.media.base.BaseActivity
 import com.zph.media.config.AudioConfig
 import com.zph.media.config.Constants
@@ -27,6 +27,10 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 
 
 class AudioWaveformActivity : BaseActivity() {
@@ -46,11 +50,19 @@ class AudioWaveformActivity : BaseActivity() {
     private var currentFilePathPcm = ""
     private var currentFilePathWav = ""
 
+    private var mAudioTrackManage: AudioTrackManager?=null
+
+
     //语音识别的相关
     // 语音听写对象
     private var mIat: SpeechRecognizer? = null
     init {
-//        System.loadLibrary("native-lib")
+        try {
+            System.loadLibrary("lame-lib")
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
     }
     companion object {
         open fun openActivity(activity: Activity) {
@@ -74,7 +86,6 @@ class AudioWaveformActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         checkPermissions()
         mIat = SpeechRecognizer.createRecognizer(this, null)
-        setParam()
     }
     open fun setConvertProgress(progrss:Int){
 
@@ -108,9 +119,18 @@ class AudioWaveformActivity : BaseActivity() {
             PcmToWav()
         }
         btn_audio_Waveform.setOnClickListener {
-            //WAV转为波形显示
-//            showWaveform()
-            standard()
+            //Lame转换使用
+            showWaveform()
+        }
+        btn_audio_track.setOnClickListener {
+            //AduioTrack播放PCM数据格式音频
+            if (btn_audio_track.text.toString().trim() == "AudioTrack播放") {
+                btn_audio_track.text = "AudioTrack停止"
+                audioTrackPlay()
+            } else {
+                audioTrackstopPlay()
+                btn_audio_track.text = "AudioTrack播放"
+            }
         }
     }
 
@@ -129,11 +149,17 @@ class AudioWaveformActivity : BaseActivity() {
             MediaRecorder.AudioSource.MIC, AudioConfig.SAMPLE_RATE_INHZ, AudioConfig.CHANNEL_CONFIG,
             AudioConfig.AUDIO_FORMAT, minBufferSize
         )
-
+        if(AudioRecord.STATE_INITIALIZED!=audioRecord!!.state){
+            ToastUtil.showToast(this,"AudioRecord无法初始化，请检查录制权限或者是否其他app没有释放录音\n" +
+                    "器")
+            return
+        }
         val data = ByteArray(minBufferSize)
+        var sdf=SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        var timeString = sdf.format(Date())
         var dir =
             Environment.getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_PCM_FILE_PATH
-        val filename = "${System.currentTimeMillis()}.pcm"
+        val filename = "${timeString}.pcm"
         val file = File(dir, filename)
         if (file.exists()) {
             file.delete()
@@ -156,8 +182,12 @@ class AudioWaveformActivity : BaseActivity() {
                 if (AudioRecord.ERROR_INVALID_OPERATION != read) {
                     try {
                         os!!.write(data)
+                        Log.i("TAGG",data.toString())
 //                        waveformView.addData(getShort(data))
-                        audioWaveView.setWaveData(data)
+                        audioWaveView.setwaveData1(data)
+                        runOnUiThread {
+                            audioWaveView.invalidate()
+                        }
                     } catch (e: Exception) {
                     }
                 }
@@ -181,6 +211,7 @@ class AudioWaveformActivity : BaseActivity() {
         audioRecord!!.stop()
         audioRecord!!.release()
         audioRecord = null
+        audioWaveView.invalidate()
     }
 
     /**
@@ -198,7 +229,9 @@ class AudioWaveformActivity : BaseActivity() {
         }
         var dir =
             Environment.getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_WAV_FILE_PATH
-        val filename = "${System.currentTimeMillis()}.wav"
+        var sdf=SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        var wavString = sdf.format(Date())
+        val filename = "${wavString}.wav"
         var wavFile = File(dir, filename)
         if (wavFile.exists()) {
             wavFile.delete()
@@ -211,9 +244,26 @@ class AudioWaveformActivity : BaseActivity() {
         pcmToWavUtil.pcmToWav(pcmFile.absolutePath, wavFile.absolutePath)
         currentFilePathWav = wavFile.absolutePath
         ToastUtil.showToast(this@AudioWaveformActivity, "转换完成！")
-
-        Log.i("TAGG","--->version:"+ZPHLameUtils.getLameVersion());
     }
+    /**
+     * AudioTrack 播放pcm源格式数据
+     * 首先它可以直接播放pcm音频数据，但是一般是不能播放其它的格式如MP3，AAC，WAV等,
+     * */
+    private fun audioTrackPlay(){
+        var pcmFile = File(currentFilePathPcm)
+        if (!pcmFile.exists()) {
+            ToastUtil.showToast(this@AudioWaveformActivity, "PCM数据格式音频不存在！")
+            return
+        }
+        if(mAudioTrackManage==null){
+            mAudioTrackManage= AudioTrackManager()
+        }
+        mAudioTrackManage!!.startPlay(pcmFile.absolutePath)
+    }
+    private fun audioTrackstopPlay(){
+        mAudioTrackManage!!.stopPlay()
+    }
+
 
     /**
      * 转换为文本
@@ -228,167 +278,16 @@ class AudioWaveformActivity : BaseActivity() {
             ToastUtil.showToast(this@AudioWaveformActivity, "Wav音频不存在！")
             return
         }
-//        standard()
-        standard1()
-
-
+        standard()
     }
-    private fun standard1(){
 
-
-    }
+    @SuppressLint("SetTextI18n")
     @Throws(InterruptedException::class)
     private fun standard() {
-        // 初始化识别无UI识别对象
-        // 使用SpeechRecognizer对象，可根据回调消息自定义界面；
-        //1、创建SpeechRecognizer对象，第二个参数：本地识别时传InitListener
-
-//        mIat?.startListening(mRecognizerListener)
-
-//        mIat?.setParameter(SpeechConstant.AUDIO_SOURCE, "-2");
-//        mIat?.setParameter(SpeechConstant.ASR_SOURCE_PATH, currentFilePathWav)
-        var ret = mIat?.startListening(mRecognizerListener)
-        Log.i("TAG", "ret:$ret")
-        if (ret !== ErrorCode.SUCCESS) {
-            Log.i("TAG", "错误码$ret")
-////            showTip("识别失败,错误码：$ret,请点击网址https://www.xfyun.cn/document/error-code查询解决方案")
-        } else {
-            Log.i("TAG", "successs")
-//            val audioData: ByteArray = File(currentFilePathWav).readBytes()
-//            if (null != audioData) {
-//                Log.i("TAG", "ok")
-////                showTip(getString(R.string.text_begin_recognizer))
-//                // 一次（也可以分多次）写入音频文件数据，数据格式必须是采样率为8KHz或16KHz（本地识别只支持16K采样率，云端都支持），位长16bit，单声道的wav或者pcm
-//                // 写入8KHz采样的音频时，必须先调用setParameter(SpeechConstant.SAMPLE_RATE, "8000")设置正确的采样率
-//                // 注：当音频过长，静音部分时长超过VAD_EOS将导致静音后面部分不能识别
-//                mIat?.writeAudio(audioData, 0, audioData.size)
-//                mIat?.stopListening()
-//            } else {
-//                mIat?.cancel()
-//                Log.i("TAG", "error")
-////                showTip("读取音频流失败")
-//            }
-        }
+        tvLameVersion.text="当前的Lame版本号是："+ZPHLameUtils.getLameVersion()
     }
 
-    private val mRecognizerListener = object : RecognizerListener {
-        override fun onVolumeChanged(p0: Int, data: ByteArray?) {
-//            Log.i("TAG", "返回音频数据：" + data?.size)
-            Log.i("TAG", "当前正在说话，音量大小：$p0");
-           waveformView.addData(p0.toShort())
-        }
 
-        override fun onResult(results: RecognizerResult?, isLast: Boolean) {
-            Log.i("TAG","结果"+results?.resultString);
-            results?.let { printResult(it) }
-        }
-
-        override fun onBeginOfSpeech() {
-            Log.i("TAG", "onBeginOfSpeech")
-        }
-        //扩展用接口
-        override fun onEvent(p0: Int, p1: Int, p2: Int, p3: Bundle?) {
-            Log.i("TAG", "onEvent")
-        }
-
-        override fun onEndOfSpeech() {
-            Log.i("TAG", "onEndOfSpeech")
-            waveformView.clear()
-        }
-
-        override fun onError(p0: SpeechError?) {
-            Log.i("TAG", "onError${p0?.errorCode}")
-        }
-    }
-
-    // 用HashMap存储听写结果
-    private val mIatResults: HashMap<String, String> = LinkedHashMap()
-    private fun printResult(recognizerResult: RecognizerResult) {
-        val text = parseIatResult(recognizerResult.resultString)
-        var sn: String? = null
-        //读取Json结果中的sn字段
-        try {
-            val resultJson = JSONObject(recognizerResult.resultString)
-            sn = resultJson.optString("sn")
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-        mIatResults[sn!!] = text!!
-        val sb = StringBuilder()
-        for (key in mIatResults.keys) {
-            sb.append(mIatResults[key])
-        }
-//        tv_sppech.setText(sb.toString())
-//        tv_sppech.setSelection(tv_sppech.length())
-    }
-    /**
-     * 初始化监听器。
-     */
-    private val mInitListener = InitListener { code ->
-        Log.i("TAG", "SpeechRecognizer init() code = $code")
-        if (code != ErrorCode.SUCCESS) {
-            Log.i("TAG", "初始化失败,错误码：$code,请点击网址https://www.xfyun.cn/document/error-code查询解决方案")
-        }
-    }
-
-    /**
-     * 参数设置
-     * @return
-     */
-    // 引擎类型
-    private var mEngineType: String? = SpeechConstant.TYPE_CLOUD
-
-    fun setParam() {
-        //参数设置
-        /**
-         * 应用领域 服务器为不同的应用领域，定制了不同的听写匹配引擎，使用对应的领域能获取更 高的匹配率
-         * 应用领域用于听写和语音语义服务。当前支持的应用领域有：
-         * 短信和日常用语：iat (默认)
-         * 视频：video
-         * 地图：poi
-         * 音乐：music
-         */
-        mIat?.setParameter(SpeechConstant.DOMAIN,"iat");
-        /**
-         * 在听写和语音语义理解时，可通过设置此参数，选择要使用的语言区域
-         * 当前支持：
-         * 简体中文：zh_cn（默认）
-         * 美式英文：en_us
-         */
-        mIat?.setParameter(SpeechConstant.LANGUAGE,"zh_cn");
-        /**
-         * 每一种语言区域，一般还有不同的方言，通过此参数，在听写和语音语义理解时， 设置不同的方言参数。
-         * 当前仅在LANGUAGE为简体中文时，支持方言选择，其他语言区域时， 请把此参数值设为null。
-         * 普通话：mandarin(默认)
-         * 粤 语：cantonese
-         * 四川话：lmz
-         * 河南话：henanese
-         */
-        mIat?.setParameter(SpeechConstant.ACCENT,"mandarin");
-        // 设置听写引擎
-        mIat?.setParameter(SpeechConstant.ENGINE_TYPE, mEngineType);
-        //设置语音前端点：静音超时时间，即用户多长时间不说话则当做超时处理
-        //默认值：短信转写5000，其他4000
-        mIat?.setParameter(SpeechConstant.VAD_BOS,"4000");
-        // 设置语音后端点:后端点静音检测时间，即用户停止说话多长时间内即认为不再输入， 自动停止录音
-        mIat?.setParameter(SpeechConstant.VAD_EOS,"1000");
-        // 设置标点符号,设置为"0"返回结果无标点,设置为"1"返回结果有标点
-        mIat?.setParameter(SpeechConstant.ASR_PTT,"1");
-        // 设置音频保存路径，保存音频格式支持pcm、wav
-        mIat?.setParameter(SpeechConstant.AUDIO_FORMAT,"wav");
-        //mIat.setParameter(SpeechConstant.ASR_AUDIO_PATH, Environment.getExternalStorageDirectory()+"/msc/iat.wav");
-        //文本，编码
-        mIat?.setParameter(SpeechConstant.TEXT_ENCODING, "utf-8");
-
-
-//        var dir =
-//            Environment.getExternalStorageDirectory().path + File.separator + Constants.APP_HOME_PATH_ + Constants.ZPH_IFLY_WAV_FILE_PATH
-//        val filename = "${System.currentTimeMillis()}.wav"
-//        mIat?.setParameter(
-//            SpeechConstant.ASR_AUDIO_PATH,
-//            dir + filename
-//        )
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

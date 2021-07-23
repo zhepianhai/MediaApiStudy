@@ -3,6 +3,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'com.didi.dokit'
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\牛魁\\Desktop\\zph.jks')
+            storePassword '123456'
+            keyAlias 'zph'
+            keyPassword '123456'
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
@@ -29,6 +37,18 @@ android {
 
         }
     }
+//    buildFeatures {
+//        compose true
+//    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+
     sourceSets.main.jniLibs.srcDirs = ['libs']
     kotlinOptions {
         jvmTarget = '1.8'
@@ -92,6 +112,10 @@ dependencies {
     implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
     //WebRtc For Android
     implementation 'org.webrtc:google-webrtc:1.0.26131'
+    //Jetpack
+    implementation 'androidx.ui:ui-tooling:0.1.0-dev02'
+    implementation 'androidx.ui:ui-layout:0.1.0-dev02'
+    implementation 'androidx.ui:ui-material:0.1.0-dev02'
 
 }
 //dokitExt {

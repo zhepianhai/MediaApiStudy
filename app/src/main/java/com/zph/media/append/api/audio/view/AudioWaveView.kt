@@ -28,7 +28,7 @@ class AudioWaveView @JvmOverloads constructor(
     private val LUMP_COLOR = Color.parseColor("#FFBBFF")
     private val scale = 2f
 
-    private lateinit var waveData: ByteArray
+    private lateinit var waveData1: ByteArray
     private  var pointList: MutableList<Point> =ArrayList()
     private lateinit var lumpPaint: Paint
 
@@ -43,8 +43,8 @@ class AudioWaveView @JvmOverloads constructor(
         lumpPaint.color = LUMP_COLOR
     }
 
-    fun setWaveData(data: ByteArray) {
-        this.waveData=data
+    fun setwaveData1(data: ByteArray) {
+        this.waveData1=data
         if(pointList==null){
             pointList=ArrayList()
         }else{

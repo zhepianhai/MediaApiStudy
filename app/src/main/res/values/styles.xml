@@ -10,4 +10,14 @@
         <item name="qmui_skin_support_topbar_image_tint_color">@color/qmui_config_color_white</item>
     </style>
 
+
+    <style name="qmui_round_buton">
+        <item name="android:textColor">@color/colorBg2</item>
+        <item name="qmui_backgroundColor">@color/colorBg</item>
+        <item name="qmui_borderColor">@color/colorBg</item>
+        <item name="qmui_borderWidth">1dp</item>
+        <item name="qmui_isRadiusAdjustBounds">true</item>
+        <item name="qmui_radius">5dp</item>
+    </style>
+
 </resources>

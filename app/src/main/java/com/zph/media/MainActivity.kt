@@ -121,7 +121,7 @@ class MainActivity : BaseActivity() {
         mData.add(15, "NDK使用")
         adapter = AdapterGridHome(this, mData)
         gridview_home.adapter = adapter
-        gridview_home.setOnItemClickListener { parent, view, position, id ->
+        gridview_home.setOnItemClickListener { _, _, position, _ ->
             run {
                 when (position) {
                     0 -> {
