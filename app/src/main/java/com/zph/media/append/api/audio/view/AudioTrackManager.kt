@@ -13,8 +13,8 @@ import java.io.FileInputStream
  * 用于播放PCM
  * */
 class AudioTrackManager {
-    private var mAudioTrack: AudioTrack?=null
-    private var mDis: DataInputStream?=null  //播放文件的数据流
+    private var mAudioTrack: AudioTrack? = null
+    private var mDis: DataInputStream? = null  //播放文件的数据流
     private var mRecordThread: Thread? = null
     private var isStart = false
 
@@ -131,19 +131,20 @@ class AudioTrackManager {
         setPath(path)
         startThread()
     }
+
     /**
      * 停止播放
      * */
-    fun stopPlay(){
+    fun stopPlay() {
         try {
             destroyThread()
-            if(mAudioTrack!!.state==AudioTrack.STATE_INITIALIZED){
+            if (mAudioTrack!!.state == AudioTrack.STATE_INITIALIZED) {
                 mAudioTrack!!.stop()//停止
             }
             mAudioTrack!!.release()//释放资源
             mDis!!.close()//关闭输入流
 
-        }catch (e:java.lang.Exception){
+        } catch (e: java.lang.Exception) {
 
         }
     }
@@ -172,3 +173,23 @@ class AudioTrackManager {
 
 
 }
+/**
+ * 在实践中遇到了不少问题，不过最终都得以解决，记录如下
+1: stream模式快速点击 声音重叠，如何停止：在触发播放前先停止和释放auidoTrack，然后在进行init，
+在audioTrack写入数据的线程中write操作要做好audiotTrack的状态判断。具体实现见上面小节的 代码
+2：如何监听播放进度：AudioTrack有没有想MediaPlayer的丰富的监听回调，比如说，播放进度，播放
+完成回调，异常回调等。遗憾的是还真没有，针对STATIC模式的播放结束监听倒是可以借助
+setNotificationMarkerPosition 和 setPlaybackPositionUpdateListener来判断来判断。具体见上面小
+节中STATIC模式的实现
+3: staic模式下有时候无法播放；音频在快速连续点击中加了isplaying的片段，如果正在playing中有触发
+了play，会先stop然后调用audioTrack.reloadStaticData()加载数据流，再进行播放，但是发现快速 连
+续点击是间隔一次才会播放生效，原因还是audioTrack资源没有被正确使用，改为了先release在进行init
+的方式。
+4: IllegalStateException: Unable to retrieve AudioTrack pointer for write()：这个异常是stream模式
+时在主线程出发了stop或者release，而在audioTrack子线程write时抛出的异常，原因就是播放状态不
+对，如果已经处于Stropped状态，再进行write操作就会报这个错误，所以write时加个playstate状态的
+检验。
+
+ **/
+
+
